@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "app.macro-deck.sample",
+  "name": "Sample",
+  "version": "1.0.0",
+  "description": "Worked example plugin exercising every remote capability kind: actions (plain, slider, dynamic options), variables, events, a config flow and a weather provider.",
+  "icon": "Assets/icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "MacroDeck.SamplePlugin.exe" },
+    "osx-arm64": { "executable": "MacroDeck.SamplePlugin" },
+    "osx-x64": { "executable": "MacroDeck.SamplePlugin" },
+    "linux-x64": { "executable": "MacroDeck.SamplePlugin" }
+  }
+}

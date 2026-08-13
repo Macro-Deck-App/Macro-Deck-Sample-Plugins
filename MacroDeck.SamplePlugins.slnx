@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/solution/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MacroDeck.SamplePlugin/MacroDeck.SamplePlugin.csproj" />
+  </Folder>
+</Solution>

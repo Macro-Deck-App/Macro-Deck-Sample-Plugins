@@ -6,6 +6,15 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/MacroDeck.SamplePlugin/MacroDeck.SamplePlugin.csproj" />
+    <Project Path="src/MacroDeck.SampleWeatherPlugin/MacroDeck.SampleWeatherPlugin.csproj" />
+    <Project Path="src/MacroDeck.SampleMusicPlayerPlugin/MacroDeck.SampleMusicPlayerPlugin.csproj" />
+    <Project Path="src/MacroDeck.SampleRestApiPlugin/MacroDeck.SampleRestApiPlugin.csproj" />
+    <Project Path="src/MacroDeck.SampleVirtualProfilePlugin/MacroDeck.SampleVirtualProfilePlugin.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MacroDeck.SampleWeatherPlugin.Tests/MacroDeck.SampleWeatherPlugin.Tests.csproj" />
+    <Project Path="tests/MacroDeck.SampleMusicPlayerPlugin.Tests/MacroDeck.SampleMusicPlayerPlugin.Tests.csproj" />
+    <Project Path="tests/MacroDeck.SampleRestApiPlugin.Tests/MacroDeck.SampleRestApiPlugin.Tests.csproj" />
+    <Project Path="tests/MacroDeck.SampleVirtualProfilePlugin.Tests/MacroDeck.SampleVirtualProfilePlugin.Tests.csproj" />
   </Folder>
 </Solution>

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "app.macro-deck.sample-music-player",
+  "name": "Sample Music Player",
+  "version": "1.0.0",
+  "description": "Synthetic music player: transport controls, artwork, catalogue browsing, output devices, two instances, plus actions, variables and events on the same playback state.",
+  "icon": "Assets/icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin.exe" },
+    "osx-arm64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" },
+    "osx-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" },
+    "linux-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" }
+  }
+}

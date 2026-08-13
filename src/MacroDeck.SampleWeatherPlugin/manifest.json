@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "app.macro-deck.sample-weather",
+  "name": "Sample Weather",
+  "version": "1.0.0",
+  "description": "Synthetic weather plugin: plain, slider and dynamic-options actions, variables, an event, a config flow and a weather provider on one shared reading.",
+  "icon": "Assets/icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "MacroDeck.SampleWeatherPlugin.exe" },
+    "osx-arm64": { "executable": "MacroDeck.SampleWeatherPlugin" },
+    "osx-x64": { "executable": "MacroDeck.SampleWeatherPlugin" },
+    "linux-x64": { "executable": "MacroDeck.SampleWeatherPlugin" }
+  }
+}

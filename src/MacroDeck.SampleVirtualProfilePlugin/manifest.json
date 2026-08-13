@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "app.macro-deck.sample-virtual-profile",
+  "name": "Sample Control Room",
+  "version": "1.0.0",
+  "description": "A plugin-owned virtual profile with widget interactions, plus the host callback APIs: deck navigation, widget appearance, scripts, variables and notifications.",
+  "icon": "Assets/icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin.exe" },
+    "osx-arm64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" },
+    "osx-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" },
+    "linux-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" }
+  }
+}

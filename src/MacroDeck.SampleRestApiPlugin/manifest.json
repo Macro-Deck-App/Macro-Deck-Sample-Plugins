@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "app.macro-deck.sample-rest-api",
+  "name": "Sample Task Board",
+  "version": "1.0.0",
+  "description": "How to integrate a third-party REST API: typed HttpClient through DI, a multi-step config flow with a secret and an OAuth branch, integration issues, API-backed variables, events and dynamic options.",
+  "icon": "Assets/icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "MacroDeck.SampleRestApiPlugin.exe" },
+    "osx-arm64": { "executable": "MacroDeck.SampleRestApiPlugin" },
+    "osx-x64": { "executable": "MacroDeck.SampleRestApiPlugin" },
+    "linux-x64": { "executable": "MacroDeck.SampleRestApiPlugin" }
+  }
+}

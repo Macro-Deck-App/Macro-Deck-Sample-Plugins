@@ -33,9 +33,11 @@ the config flow through `IssueResolutionFollowUp.StartConfigFlow`.
 
 ## Running it against a local host
 
-There is no server to point it at, which is itself the interesting part: without configuration the
-plugin reports the "not configured" issue, and with a URL that does not answer it reports the
-unreachable one. To see the happy path, run the tests - they include a fake server.
+Use this project's **Macro Deck - Real Host** launch profile as described in the repository's
+[run and debug guide](../../README.md#run-and-debug-against-macro-deck). There is no server to point it
+at, which is itself the interesting part: without configuration the plugin reports the "not
+configured" issue, and with a URL that does not answer it reports the unreachable one. To see the
+happy path, run the tests - they include a fake server.
 
 ## Testing it
 

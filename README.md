@@ -57,9 +57,7 @@ Two contracts have no sample on purpose:
 ## Requirements
 
 - .NET SDK 10.0
-- Nothing else to build. Running against a real host needs a Macro Deck 3 host; the
-  [`macrodeck-plugin` CLI](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/cli.md)
-  runs a plugin against a disposable stub host without one.
+- A running Macro Deck desktop app for interactive debugging
 
 ## Quick start
 
@@ -71,13 +69,35 @@ dotnet build
 dotnet test
 ```
 
-```bash
-dotnet tool install --global MacroDeck.Plugin.Cli --prerelease
-```
+## Run and debug against Macro Deck
 
-```bash
-macrodeck-plugin run --project src/MacroDeck.SampleWeatherPlugin
-```
+Every source project contains one `.NET` launch profile named **Macro Deck - Real Host**. It starts the
+plugin project directly, connects to `http://127.0.0.1:8193` in self-registering mode and stores its
+local development credential under that project's `.macrodeck-dev-state/` directory. Because the IDE
+launches the project itself, breakpoints work without attaching to a child process.
+
+For the first run:
+
+1. Start the Macro Deck desktop app.
+2. Open **Developer Tools → Plugin tokens**, create a token and copy it. It is shown only once.
+3. Open the selected plugin project's **.NET User Secrets** file in your IDE and add:
+
+   ```json
+   {
+     "MacroDeck:Plugin:EnrollmentToken": "<paste the one-time token here>"
+   }
+   ```
+
+4. Select **Macro Deck - Real Host** for that source project and start it with **Debug**.
+5. Once enrollment succeeds, remove the token from User Secrets. Later launches reuse the credential
+   in `.macrodeck-dev-state/`.
+
+User Secrets and `.macrodeck-dev-state/` are local-only. Never paste an enrollment token into
+`launchSettings.json`, a shared IDE configuration, a shell command or a commit. Repeat the setup for
+each sample you want to launch; each project has its own User Secrets store and plugin identity.
+
+The checked-in launch profile is the only supported interactive start path in this repository. The
+CLI remains useful for the non-interactive conformance check below.
 
 ## Testing
 

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using MacroDeck.Plugin.Protocol.Capabilities.Actions;
 using MacroDeck.Plugin.Protocol.Capabilities.Events;
 using MacroDeck.Plugin.Protocol.Capabilities.MusicPlayer;

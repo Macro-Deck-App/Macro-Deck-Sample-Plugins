@@ -1,4 +1,3 @@
-using MacroDeck.SampleRestApiPlugin.Api;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleRestApiPlugin.Actions;

@@ -80,21 +80,75 @@ For the first run:
 
 1. Start the Macro Deck desktop app.
 2. Open **Developer Tools → Plugin tokens**, create a token and copy it. It is shown only once.
-3. Open the selected plugin project's **.NET User Secrets** file in your IDE and add:
-
-   ```json
-   {
-     "MacroDeck:Plugin:EnrollmentToken": "<paste the one-time token here>"
-   }
-   ```
-
+3. Store the token in the selected source project's **.NET User Secrets** using one of the methods
+   below. The projects are already initialized; do not run `dotnet user-secrets init`.
 4. Select **Macro Deck - Real Host** for that source project and start it with **Debug**.
 5. Once enrollment succeeds, remove the token from User Secrets. Later launches reuse the credential
    in `.macrodeck-dev-state/`.
 
-User Secrets and `.macrodeck-dev-state/` are local-only. Never paste an enrollment token into
-`launchSettings.json`, a shared IDE configuration, a shell command or a commit. Repeat the setup for
-each sample you want to launch; each project has its own User Secrets store and plugin identity.
+### Set the token in Rider or Visual Studio
+
+In Rider, right-click the **source project** in the Solution Explorer and select
+**Tools → .NET User Secrets**. In Visual Studio, right-click the source project and select
+**Manage User Secrets**. Do this on `MacroDeck.SampleWeatherPlugin`, for example, not its `.Tests`
+project.
+
+The IDE opens a `secrets.json` file stored in your user profile, outside this repository. Replace its
+contents with:
+
+```json
+{
+  "MacroDeck:Plugin:EnrollmentToken": "<paste the one-time token here>"
+}
+```
+
+Save the file, then start **Macro Deck - Real Host**. After enrollment, reopen `secrets.json` and
+remove the `MacroDeck:Plugin:EnrollmentToken` entry.
+
+### Set the token from a terminal
+
+From the repository root on macOS or Linux, set `project` to the sample you want to enroll. This form
+reads the token without echoing it and does not put the value in shell history or process arguments:
+
+```bash
+project="src/MacroDeck.SampleWeatherPlugin/MacroDeck.SampleWeatherPlugin.csproj"
+printf "Enrollment token: "
+read -rs md_enrollment_token
+printf '\n'
+printf '{"MacroDeck:Plugin:EnrollmentToken":"%s"}\n' "$md_enrollment_token" |
+  dotnet user-secrets set --project "$project"
+unset md_enrollment_token
+```
+
+After the first successful profile launch, remove the one-time token:
+
+```bash
+dotnet user-secrets remove "MacroDeck:Plugin:EnrollmentToken" --project "$project"
+```
+
+With PowerShell 7, use the equivalent masked-input form:
+
+```powershell
+$project = "src/MacroDeck.SampleWeatherPlugin/MacroDeck.SampleWeatherPlugin.csproj"
+$token = Read-Host "Enrollment token" -MaskInput
+@{ "MacroDeck:Plugin:EnrollmentToken" = $token } |
+  ConvertTo-Json -Compress |
+  dotnet user-secrets set --project $project
+Remove-Variable token
+```
+
+Then remove it after enrollment:
+
+```powershell
+dotnet user-secrets remove "MacroDeck:Plugin:EnrollmentToken" --project $project
+```
+
+Repeat the setup for each sample you want to launch; every source project has its own User Secrets
+store and plugin identity. User Secrets are local-only but not encrypted. Never put an enrollment
+token in `launchSettings.json`, a shared IDE configuration, a literal command argument or a commit.
+See the official [Rider User Secrets guide](https://www.jetbrains.com/help/rider/Manage_NET_user_secrets.html)
+and [.NET Secret Manager guide](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-10.0)
+for more background.
 
 The checked-in launch profile is the only supported interactive start path in this repository. The
 CLI remains useful for the non-interactive conformance check below.

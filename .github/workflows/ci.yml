@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: 10.0.x
+
+jobs:
+  build-and-test:
+    name: Build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('NuGet.config', 'Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build
+        run: dotnet build MacroDeck.SamplePlugins.slnx -c Release -warnaserror
+
+      - name: Test
+        run: >
+          dotnet test MacroDeck.SamplePlugins.slnx -c Release --no-build
+          --logger trx --results-directory TestResults
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          retention-days: 14
+          if-no-files-found: error
+
+  conformance:
+    name: Macro Deck tooling (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Weather
+            project: src/MacroDeck.SampleWeatherPlugin
+            report: weather
+          - name: Music player
+            project: src/MacroDeck.SampleMusicPlayerPlugin
+            report: music-player
+          - name: REST API
+            project: src/MacroDeck.SampleRestApiPlugin
+            report: rest-api
+          - name: Virtual profile
+            project: src/MacroDeck.SampleVirtualProfilePlugin
+            report: virtual-profile
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('NuGet.config', 'Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # Keep the developer CLI on the same release as the SDK packages consumed by the samples.
+      - name: Install Macro Deck tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(dotnet msbuild "${{ matrix.project }}" -nologo -getProperty:MacroDeckSdkVersion)"
+          dotnet tool install --global MacroDeck.Plugin.Cli --version "${version}"
+
+      # --project deliberately lets the Macro Deck CLI build the plugin before driving a real
+      # protocol session against it, rather than testing only an already-built assembly.
+      - name: Build and run conformance tests
+        run: >
+          macrodeck-plugin test --project "${{ matrix.project }}"
+          --report markdown --output "conformance-${{ matrix.report }}.md"
+          --no-color --timeout 30
+
+      - name: Upload conformance report
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: conformance-${{ matrix.report }}
+          path: conformance-${{ matrix.report }}.md
+          retention-days: 14
+          if-no-files-found: error

@@ -104,11 +104,8 @@ macrodeck-plugin test --project src/MacroDeck.SampleWeatherPlugin
 
 ## Building against a local SDK build
 
-> **Right now this is not optional.** The samples use SDK surface that is not in `3.0.0-preview.1`
-> yet, so a plain `dotnet build` fails until the next preview is published. Build against a locally
-> packed SDK as described here until then.
-
-The samples track the SDK's *published* packages. While a change is still unreleased - a new API, a
+The samples track the SDK's *published* packages and float to the newest one, so a plain
+`dotnet build` always resolves the latest release. While a change is still unreleased - a new API, a
 fix you want to try - pack the SDK from a Macro Deck 3 checkout into this repository's `local-feed/`
 and build against that version:
 
@@ -124,9 +121,9 @@ dotnet build -p:MacroDeckSdkVersion=3.0.0-local.1
 version for every Macro Deck package at once (see `Directory.Packages.props`). Nothing in the
 repository pins the local version, so a plain `dotnet build` goes back to the published one.
 
-Pick a version that cannot collide with a real release - `3.0.0-local.N` rather than reusing
-`3.0.0-preview.1`, which would put a hand-built package into the global NuGet cache under the name of
-a published one.
+Pick a version that cannot collide with a real release - `3.0.0-local.N` rather than reusing a
+published preview version, which would put a hand-built package into the global NuGet cache under the
+name of a published one.
 
 ## Further reading
 

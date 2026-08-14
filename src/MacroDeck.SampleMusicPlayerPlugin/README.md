@@ -28,9 +28,10 @@ degrades - see the parity matrix.
 
 ## Running it against a local host
 
-Same as the weather sample: run the project with `MACRO_DECK_PLUGIN_HOST_URL` and an enrollment token,
-then add the "Sample library" instance to a Music Player widget. Playback, artwork, the catalogue and
-the device list all work without any account.
+Use this project's **Macro Deck - Real Host** launch profile as described in the repository's
+[run and debug guide](../../README.md#run-and-debug-against-macro-deck). Then add the "Sample library"
+instance to a Music Player widget. Playback, artwork, the catalogue and the device list all work
+without any account.
 
 ## Testing it
 

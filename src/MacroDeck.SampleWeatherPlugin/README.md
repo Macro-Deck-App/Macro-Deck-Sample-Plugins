@@ -29,14 +29,11 @@ builds, runs and tests without credentials or network access.
 
 ## Running it against a local host
 
-1. `dotnet run --project src/MacroDeck.SampleWeatherPlugin`, with `MACRO_DECK_PLUGIN_HOST_URL` pointing
-   at your running host (for example `http://127.0.0.1:7193`).
-2. This sample registers itself, so it runs in **self-registering** mode: create a token under
-   **Developer → Plugin tokens** in the desktop app and set `MACRO_DECK_PLUGIN_ENROLLMENT_TOKEN` before
-   starting. The plugin exchanges it for a secret once and reuses that secret afterwards.
-3. It then shows up as "Sample Weather" with three actions, a config flow, a weather station and two
-   variables. Configure a location, add the station to a Weather widget, and press "Refresh weather" to
-   watch the location, the temperature and the event move together.
+Use this project's **Macro Deck - Real Host** launch profile as described in the repository's
+[run and debug guide](../../README.md#run-and-debug-against-macro-deck). It then shows up as "Sample
+Weather" with three actions, a config flow, a weather station and two variables. Configure a location,
+add the station to a Weather widget, and press "Refresh weather" to watch the location, the temperature
+and the event move together.
 
 Self-registering mode only works against a host on the same machine - plugin endpoints are local-only
 by design.

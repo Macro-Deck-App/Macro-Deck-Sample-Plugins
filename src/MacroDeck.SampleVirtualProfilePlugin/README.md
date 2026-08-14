@@ -35,9 +35,10 @@ gets, and ignoring it is the most common way a plugin breaks in the field.
 
 ## Running it against a local host
 
-Run the project as the other samples do, then switch to the "Sample Control Room" profile. Its buttons
-are the plugin's, not the user's: pressing one changes the scene, recolours the grid and updates the
-`sample_control_room_scene` variable.
+Use this project's **Macro Deck - Real Host** launch profile as described in the repository's
+[run and debug guide](../../README.md#run-and-debug-against-macro-deck), then switch to the "Sample
+Control Room" profile. Its buttons are the plugin's, not the user's: pressing one changes the scene,
+recolours the grid and updates the `sample_control_room_scene` variable.
 
 ## Testing it
 

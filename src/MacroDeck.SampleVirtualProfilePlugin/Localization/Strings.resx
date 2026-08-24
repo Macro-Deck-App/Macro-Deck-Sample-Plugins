@@ -55,14 +55,8 @@
   <data name="WidgetStates.Current" xml:space="preserve">
     <value>Current state</value>
   </data>
-  <data name="WidgetStates.On" xml:space="preserve">
-    <value>On state</value>
-  </data>
-  <data name="WidgetStates.Off" xml:space="preserve">
-    <value>Off state</value>
-  </data>
-  <data name="WidgetStates.Both" xml:space="preserve">
-    <value>Both states</value>
+  <data name="WidgetStates.All" xml:space="preserve">
+    <value>All states</value>
   </data>
   <data name="Actions.Announce.Name" xml:space="preserve">
     <value>Announce</value>

@@ -17,7 +17,9 @@ running its "set scene" action end in the same method, so the two directions sta
   redraw, publishing the event, writing a host variable and notifying the user.
 - **`Actions/StyleWidgetAction.cs`** - `IWidgetApi`: the widget target defaults to `$self`, so the action
   styles the button it was triggered from, and an empty colour clears the override instead of setting
-  one.
+  one. Which appearance to change is addressed through `StateIds` by the widget's own stable state ids,
+  read off `WidgetTargetInfo.States` at edit time, plus the `$current` and `$all` sentinels - not the
+  deprecated fixed `WidgetStateSelector`.
 - **`Actions/NavigateDeckAction.cs`** - `IDeckNavigator`, with the target field only shown for the kinds
   that need one. Its options come from a host-pushed cache, which is empty for a moment right after
   connecting - expected, not an error.

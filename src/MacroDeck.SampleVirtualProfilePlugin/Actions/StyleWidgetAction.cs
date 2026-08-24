@@ -10,8 +10,12 @@ namespace MacroDeck.SampleVirtualProfilePlugin.Actions;
 /// defaults to <c>$self</c>, so the action styles the button it was triggered from unless another one
 /// was picked, and an empty colour clears the override rather than setting one.
 /// </summary>
-internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IActionDefinition
+internal sealed class StyleWidgetAction(ControlRoomIntegration integration)
+	: IActionDefinition, IDynamicOptionsActionDefinition
 {
+	private const string WidgetParameter = "widget";
+	private const string StateParameter = "state";
+
 	public string Id => "style-widget";
 
 	public LocalizedText Name => Strings.Actions.StyleWidget.Name();
@@ -20,26 +24,44 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.WidgetTarget("widget", label: Strings.Actions.StyleWidget.Widget.Label()),
+		ActionParameter.WidgetTarget(WidgetParameter, label: Strings.Actions.StyleWidget.Widget.Label()),
 		ActionParameter.Text("label", label: Strings.Actions.StyleWidget.LabelText.Label(), maxLength: 40),
 		ActionParameter.Color("backgroundColor", label: Strings.Actions.StyleWidget.Background.Label(), supportsReset: true),
 		ActionParameter.Icon("icon", label: Strings.Actions.StyleWidget.Icon.Label()),
-		ActionParameter.Choice("state",
-			[
-				new ActionParameterOption
-				{
-					Value = nameof(WidgetStateSelector.Current),
-					Label = Strings.WidgetStates.Current()
-				},
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.On), Label = Strings.WidgetStates.On() },
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.Off), Label = Strings.WidgetStates.Off() },
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.Both), Label = Strings.WidgetStates.Both() }
-			],
+		// The states a widget has are the widget's own, so they cannot be listed at declaration time -
+		// GetDynamicOptionsAsync reads them off the target the user picked.
+		ActionParameter.DynamicChoice(StateParameter,
 			label: Strings.Actions.StyleWidget.State.Label(),
-			defaultValue: nameof(WidgetStateSelector.Current))
+			placeholder: Strings.WidgetStates.Current())
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
+
+	/// <summary>
+	/// The two sentinels every widget accepts, followed by whatever states this particular widget
+	/// declares. A widget with a single appearance reports none, and then only the sentinels are offered.
+	/// </summary>
+	public Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
+	{
+		List<ActionParameterOption> options =
+		[
+			new() { Value = WidgetStates.Current, Label = Strings.WidgetStates.Current() },
+			new() { Value = WidgetStates.All, Label = Strings.WidgetStates.All() }
+		];
+
+		var target = context.CurrentParameters.GetValueOrDefault(WidgetParameter) as string;
+		var widget = integration.Context?.Widgets.GetWidgets()
+			.FirstOrDefault(candidate => string.Equals(candidate.Id, target, StringComparison.Ordinal));
+
+		// A state's label is the one the deck author gave it, so it stays a literal.
+		options.AddRange(widget?.States.Select(state => new ActionParameterOption
+		{
+			Value = state.Id,
+			Label = state.Label
+		}) ?? []);
+
+		return Task.FromResult(new DynamicOptionsResult { Options = options });
+	}
 
 	private sealed class Executor(ControlRoomIntegration integration) : IActionExecutor
 	{
@@ -50,7 +72,7 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 				return ActionResult.Failed(ActionErrorCodes.Unavailable, Strings.Errors.NotInitialized());
 			}
 
-			var target = context.Parameters.GetValueOrDefault("widget") as string;
+			var target = context.Parameters.GetValueOrDefault(WidgetParameter) as string;
 			var widgetId = WidgetTargets.IsSelf(target) || string.IsNullOrWhiteSpace(target)
 				? context.OwnerWidgetId
 				: target;
@@ -66,12 +88,13 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 				? new[] { WidgetAppearanceProperty.BackgroundColor }
 				: [];
 
+			// StateIds, not the deprecated State selector: a widget's states are addressed by their own
+			// stable ids now, and the two sentinels cover "whichever it shows" and "all of them".
+			var stateId = context.Parameters.GetValueOrDefault(StateParameter) as string;
 			var request = new WidgetAppearanceRequest
 			{
 				WidgetId = widgetId,
-				State = Enum.TryParse<WidgetStateSelector>(context.Parameters.GetValueOrDefault("state") as string, out var state)
-					? state
-					: WidgetStateSelector.Current,
+				StateIds = [string.IsNullOrWhiteSpace(stateId) ? WidgetStates.Current : stateId],
 				ClearProperties = clear,
 				Patch = new WidgetAppearancePatch
 				{

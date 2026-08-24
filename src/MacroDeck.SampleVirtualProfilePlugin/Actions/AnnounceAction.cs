@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.Notifications;
 
@@ -12,25 +13,39 @@ internal sealed class AnnounceAction(ControlRoomIntegration integration) : IActi
 {
 	public string Id => "announce";
 
-	public string Name => "Announce";
+	public LocalizedText Name => Strings.Actions.Announce.Name();
 
-	public string Description => "Shows a notification in the Macro Deck app.";
+	public LocalizedText Description => Strings.Actions.Announce.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.Text("title", label: "Title", required: true, maxLength: 60),
-		ActionParameter.MultilineText("message", label: "Message", placeholder: "Optional details"),
+		ActionParameter.Text("title", label: Strings.Actions.Announce.Title.Label(), required: true, maxLength: 60),
+		ActionParameter.MultilineText("message",
+			label: Strings.Actions.Announce.Message.Label(),
+			placeholder: Strings.Actions.Announce.Message.Placeholder()),
 		ActionParameter.Choice("level",
 			[
-				new ActionParameterOption { Value = nameof(UserNotificationLevel.Info), Label = "Info" },
-				new ActionParameterOption { Value = nameof(UserNotificationLevel.Warning), Label = "Warning" },
-				new ActionParameterOption { Value = nameof(UserNotificationLevel.Error), Label = "Error" }
+				new ActionParameterOption
+				{
+					Value = nameof(UserNotificationLevel.Info),
+					Label = Strings.NotificationLevels.Info()
+				},
+				new ActionParameterOption
+				{
+					Value = nameof(UserNotificationLevel.Warning),
+					Label = Strings.NotificationLevels.Warning()
+				},
+				new ActionParameterOption
+				{
+					Value = nameof(UserNotificationLevel.Error),
+					Label = Strings.NotificationLevels.Error()
+				}
 			],
-			label: "Level",
+			label: Strings.Actions.Announce.Level.Label(),
 			defaultValue: nameof(UserNotificationLevel.Info)),
 		ActionParameter.Text("key",
-			label: "Replace key",
-			description: "Notifications sharing a key replace each other instead of piling up.")
+			label: Strings.Actions.Announce.Key.Label(),
+			description: Strings.Actions.Announce.Key.Description())
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -41,16 +56,19 @@ internal sealed class AnnounceAction(ControlRoomIntegration integration) : IActi
 		{
 			if (integration.Context is not { } integrationContext)
 			{
-				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.Unavailable, "The integration is not initialized."));
+				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.Unavailable,
+					Strings.Errors.NotInitialized()));
 			}
 
 			if (context.Parameters.GetValueOrDefault("title") is not string { Length: > 0 } title)
 			{
-				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter, "title is required."));
+				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.Required(Strings.Actions.Announce.Title.Label())));
 			}
 
 			// Notifying is fire-and-forget: it never throws, even with no connection, so there is nothing
-			// to await and nothing to report back.
+			// to await and nothing to report back. Title and Message are plain strings on the request -
+			// this text is what the user typed, already in its final form.
 			integrationContext.Notifications.Notify(new UserNotificationRequest
 			{
 				Title = title,

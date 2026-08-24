@@ -69,7 +69,9 @@ public sealed class TaskBoardConfigFlowTests
 			new Dictionary<string, object?> { ["token"] = "nonsense" }))).DataAs<ConfigFlowResultDto>();
 
 		Assert.That(result!.Kind, Is.EqualTo("Error"));
-		Assert.That(result.ErrorMessage, Does.Contain("rejected the token"));
+		// Flattened into the plugin's own language here, because this harness has no connection and so no
+		// negotiated protocol version - see TaskBoardIntegrationTests for the full reason.
+		Assert.That(result.ErrorMessage?.Literal, Does.Contain("rejected the token"));
 	}
 
 	[Test]
@@ -183,7 +185,7 @@ public sealed class TaskBoardConfigFlowTests
 	{
 		var harness = PluginTestHarness.Create(builder =>
 		{
-			builder.RegisterIntegration<RestApiIntegration>();
+			builder.UseLocalization(Strings.LocalizationCatalog).RegisterIntegration<RestApiIntegration>();
 			builder.Services.AddTaskBoardApi().ConfigurePrimaryHttpMessageHandler(() => api);
 		});
 

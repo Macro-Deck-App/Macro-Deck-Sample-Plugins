@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- The default-language file. Every translation is checked against it and the fallback chain ends
+       here, so it is required even for a plugin that ships one language. Add a language by adding
+       Localization/Strings.<culture>.resx beside it (Strings.de.resx, Strings.pt-BR.resx).
+       A dotted key becomes a nested class: Actions.Foo.Name is Strings.Actions.Foo.Name(). -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Fields.Player.Label" xml:space="preserve">
+    <value>Player</value>
+  </data>
+  <data name="Fields.Track.Label" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="Fields.Artist.Label" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Fields.Volume.Label" xml:space="preserve">
+    <value>Volume (%)</value>
+  </data>
+  <data name="Fields.Device.Label" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="Fields.Item.Label" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="Fields.Kind.Label" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="Actions.TogglePlayback.Name" xml:space="preserve">
+    <value>Play/pause</value>
+  </data>
+  <data name="Actions.TogglePlayback.Description" xml:space="preserve">
+    <value>Toggles playback on one of the sample players.</value>
+  </data>
+  <data name="Actions.SetVolume.Name" xml:space="preserve">
+    <value>Set volume</value>
+  </data>
+  <data name="Actions.SetVolume.Description" xml:space="preserve">
+    <value>Sets the volume of one of the sample players.</value>
+  </data>
+  <data name="Actions.PlayCatalogItem.Name" xml:space="preserve">
+    <value>Play from library</value>
+  </data>
+  <data name="Actions.PlayCatalogItem.Description" xml:space="preserve">
+    <value>Plays a track or playlist from the sample library.</value>
+  </data>
+  <data name="Actions.PlayCatalogItem.Item.Description" xml:space="preserve">
+    <value>Leave empty to pick one on the client that pressed the button.</value>
+  </data>
+  <data name="Actions.PlayCatalogItem.Shuffle.Label" xml:space="preserve">
+    <value>Shuffle the playlist</value>
+  </data>
+  <data name="Actions.PlayCatalogItem.PickerRequested" xml:space="preserve">
+    <value>Asked the client to pick an item.</value>
+  </data>
+  <data name="Actions.TransferPlayback.Name" xml:space="preserve">
+    <value>Transfer playback</value>
+  </data>
+  <data name="Actions.TransferPlayback.Description" xml:space="preserve">
+    <value>Moves playback of the sample library to another device.</value>
+  </data>
+  <data name="Actions.TransferPlayback.Device.Description" xml:space="preserve">
+    <value>Leave empty to pick one on the client that pressed the button.</value>
+  </data>
+  <data name="Actions.TransferPlayback.StartPlayback.Label" xml:space="preserve">
+    <value>Start playing after the transfer</value>
+  </data>
+  <data name="Actions.TransferPlayback.PickerRequested" xml:space="preserve">
+    <value>Asked the client to pick a device.</value>
+  </data>
+  <data name="CatalogKinds.Track" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="CatalogKinds.Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="Events.TrackChanged.Name" xml:space="preserve">
+    <value>Track changed</value>
+  </data>
+  <data name="Events.TrackChanged.Description" xml:space="preserve">
+    <value>Raised when a player moves to another track.</value>
+  </data>
+  <data name="Errors.CatalogItemNotFound" xml:space="preserve">
+    <value>The sample library has no item with id {itemId}.</value>
+  </data>
+  <data name="Errors.DeviceNotFound" xml:space="preserve">
+    <value>The sample library has no device with id {deviceId}.</value>
+  </data>
+</root>

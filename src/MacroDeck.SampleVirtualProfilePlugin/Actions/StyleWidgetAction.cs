@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Plugin.Hosting.Transport;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.Widgets;
@@ -13,24 +14,28 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 {
 	public string Id => "style-widget";
 
-	public string Name => "Style widget";
+	public LocalizedText Name => Strings.Actions.StyleWidget.Name();
 
-	public string Description => "Applies a label and colours to a widget, or resets them.";
+	public LocalizedText Description => Strings.Actions.StyleWidget.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.WidgetTarget("widget", label: "Widget"),
-		ActionParameter.Text("label", label: "Label", maxLength: 40),
-		ActionParameter.Color("backgroundColor", label: "Background", supportsReset: true),
-		ActionParameter.Icon("icon", label: "Icon"),
+		ActionParameter.WidgetTarget("widget", label: Strings.Actions.StyleWidget.Widget.Label()),
+		ActionParameter.Text("label", label: Strings.Actions.StyleWidget.LabelText.Label(), maxLength: 40),
+		ActionParameter.Color("backgroundColor", label: Strings.Actions.StyleWidget.Background.Label(), supportsReset: true),
+		ActionParameter.Icon("icon", label: Strings.Actions.StyleWidget.Icon.Label()),
 		ActionParameter.Choice("state",
 			[
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.Current), Label = "Current state" },
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.On), Label = "On state" },
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.Off), Label = "Off state" },
-				new ActionParameterOption { Value = nameof(WidgetStateSelector.Both), Label = "Both states" }
+				new ActionParameterOption
+				{
+					Value = nameof(WidgetStateSelector.Current),
+					Label = Strings.WidgetStates.Current()
+				},
+				new ActionParameterOption { Value = nameof(WidgetStateSelector.On), Label = Strings.WidgetStates.On() },
+				new ActionParameterOption { Value = nameof(WidgetStateSelector.Off), Label = Strings.WidgetStates.Off() },
+				new ActionParameterOption { Value = nameof(WidgetStateSelector.Both), Label = Strings.WidgetStates.Both() }
 			],
-			label: "Apply to",
+			label: Strings.Actions.StyleWidget.State.Label(),
 			defaultValue: nameof(WidgetStateSelector.Current))
 	];
 
@@ -42,7 +47,7 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 		{
 			if (integration.Context is not { } integrationContext)
 			{
-				return ActionResult.Failed(ActionErrorCodes.Unavailable, "The integration is not initialized.");
+				return ActionResult.Failed(ActionErrorCodes.Unavailable, Strings.Errors.NotInitialized());
 			}
 
 			var target = context.Parameters.GetValueOrDefault("widget") as string;
@@ -53,8 +58,7 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 			if (widgetId is null)
 			{
 				// $self only resolves for a widget-triggered run; a script or an automation has no owner.
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"Pick a widget: this run has no widget of its own to style.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, Strings.Actions.StyleWidget.NoWidget());
 			}
 
 			var background = context.Parameters.GetValueOrDefault("backgroundColor") as string;
@@ -82,7 +86,8 @@ internal sealed class StyleWidgetAction(ControlRoomIntegration integration) : IA
 				var applied = await integrationContext.Widgets.ApplyAsync(request, context.CancellationToken);
 				return applied
 					? ActionResult.Success()
-					: ActionResult.Failed(ActionErrorCodes.NotFound, $"The host does not know widget '{widgetId}'.");
+					: ActionResult.Failed(ActionErrorCodes.NotFound,
+						Strings.Actions.StyleWidget.UnknownWidget(widgetId));
 			}
 			catch (HostInvocationException exception)
 			{

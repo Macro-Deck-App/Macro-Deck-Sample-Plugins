@@ -1,5 +1,6 @@
 using MacroDeck.Plugin.Hosting;
 using MacroDeck.Plugin.Protocol.Capabilities.MusicPlayer;
+using MacroDeck.Plugin.Serilog;
 using MacroDeck.Plugin.Testing;
 using NUnit.Framework;
 
@@ -75,5 +76,6 @@ public sealed class MusicPlayerOverTheWireTests
 	private static PluginHostBuilder Builder()
 		=> MacroDeckPlugin.CreatePlugin()
 			.UseMacroDeckLogging()
+			.UseLocalization(Strings.LocalizationCatalog)
 			.RegisterIntegration<MusicPlayerIntegration>();
 }

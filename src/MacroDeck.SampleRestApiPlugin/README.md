@@ -30,6 +30,9 @@ integrated, not how to send arbitrary requests.
 `GetIssuesAsync` is a live round trip, never a cached list - a stale issue is worse than none. The
 three it can report are the three a user can actually act on, and two of them hand the user back to
 the config flow through `IssueResolutionFollowUp.StartConfigFlow`.
+- **`Localization/Strings.resx`** - every string a user reads, including one `Failures.*` entry per
+  `TaskBoardFailure`. `TaskBoardException` carries both: `Message` for the log, in one fixed language,
+  and `UserMessage` as the reference a client resolves for whoever is reading the deck.
 
 ## Running it against a local host
 
@@ -48,3 +51,16 @@ dotnet test tests/MacroDeck.SampleRestApiPlugin.Tests
 `FakeTaskBoardApi.cs` is a deterministic stand-in plugged in as the client's primary handler, so the
 plugin's own request building, JSON parsing and error mapping all still run for real.
 `TaskBoardConfigFlowTests` drives the wizard step by step, including the OAuth branch.
+
+## Packaging it
+
+`macrodeck-build.json` names one self-contained `dotnet publish` per platform, and the manifest's
+entrypoints name what that publish actually produces:
+
+```bash
+macrodeck-plugin build --output ./artifacts
+```
+
+```bash
+macrodeck-plugin validate --artifact ./artifacts/app.macro-deck.sample-rest-api-1.0.0.macroDeckPlugin --level Publication
+```

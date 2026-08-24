@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- The default-language file. Every translation is checked against it and the fallback chain ends
+       here, so it is required even for a plugin that ships one language. Add a language by adding
+       Localization/Strings.<culture>.resx beside it (Strings.de.resx, Strings.pt-BR.resx).
+       A dotted key becomes a nested class: Actions.Foo.Name is Strings.Actions.Foo.Name(). -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions.RefreshWeather.Name" xml:space="preserve">
+    <value>Wetter aktualisieren</value>
+  </data>
+  <data name="Actions.RefreshWeather.Description" xml:space="preserve">
+    <value>Berechnet den synthetischen Wetterwert des Beispiels neu und veröffentlicht ihn erneut.</value>
+  </data>
+  <data name="Actions.SetAlertThreshold.Name" xml:space="preserve">
+    <value>Warnschwelle festlegen</value>
+  </data>
+  <data name="Actions.SetAlertThreshold.Description" xml:space="preserve">
+    <value>Legt die Temperatur (°C) fest, ab der weather-refreshed-Ereignisse isAlert melden.</value>
+  </data>
+  <data name="Actions.SetAlertThreshold.Threshold.Label" xml:space="preserve">
+    <value>Warnschwelle (°C)</value>
+  </data>
+  <data name="Actions.SetCondition.Name" xml:space="preserve">
+    <value>Wetterlage erzwingen</value>
+  </data>
+  <data name="Actions.SetCondition.Description" xml:space="preserve">
+    <value>Überschreibt die Wetterlage, die der nächste synthetische Messwert meldet.</value>
+  </data>
+  <data name="Actions.SetCondition.Condition.Label" xml:space="preserve">
+    <value>Wetterlage</value>
+  </data>
+  <data name="Conditions.Clear" xml:space="preserve">
+    <value>Klar</value>
+  </data>
+  <data name="Conditions.PartlyCloudy" xml:space="preserve">
+    <value>Teilweise bewölkt</value>
+  </data>
+  <data name="Conditions.Overcast" xml:space="preserve">
+    <value>Bedeckt</value>
+  </data>
+  <data name="Conditions.Rain" xml:space="preserve">
+    <value>Regen</value>
+  </data>
+  <data name="Conditions.Thunderstorm" xml:space="preserve">
+    <value>Gewitter</value>
+  </data>
+  <data name="Conditions.Snow" xml:space="preserve">
+    <value>Schnee</value>
+  </data>
+  <data name="Events.WeatherRefreshed.Name" xml:space="preserve">
+    <value>Wetter aktualisiert</value>
+  </data>
+  <data name="Events.WeatherRefreshed.Description" xml:space="preserve">
+    <value>Wird ausgelöst, sobald sich der synthetische Wetterwert des Beispiels ändert.</value>
+  </data>
+  <data name="Events.WeatherRefreshed.Temperature.Label" xml:space="preserve">
+    <value>Temperatur (°C)</value>
+  </data>
+  <data name="Events.WeatherRefreshed.Condition.Label" xml:space="preserve">
+    <value>Wetterlage</value>
+  </data>
+  <data name="Events.WeatherRefreshed.IsAlert.Label" xml:space="preserve">
+    <value>Über der Warnschwelle</value>
+  </data>
+  <data name="ConfigFlow.Location.Title" xml:space="preserve">
+    <value>Beispielort</value>
+  </data>
+  <data name="ConfigFlow.Location.Description" xml:space="preserve">
+    <value>Wähle den Ort, für den die synthetische Wetterstation des Beispiels meldet.</value>
+  </data>
+  <data name="ConfigFlow.Location.LocationName.Label" xml:space="preserve">
+    <value>Ortsname</value>
+  </data>
+  <data name="ConfigFlow.Location.UnknownStep" xml:space="preserve">
+    <value>Unbekannter Schritt.</value>
+  </data>
+</root>

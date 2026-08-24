@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleRestApiPlugin.Actions;
 using MacroDeck.SampleRestApiPlugin.Api;
 using MacroDeck.SampleRestApiPlugin.ConfigFlow;
@@ -99,6 +100,8 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 
 			if (exception.Reason != TaskBoardFailure.NotConfigured)
 			{
+				// UserNotificationRequest types both fields as plain strings, so this one notification stays
+				// in the plugin's own language until the contract carries a reference.
 				_context?.Notifications.Notify(new UserNotificationRequest
 				{
 					Title = "Task Board unavailable",
@@ -146,12 +149,12 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 		new EventDefinition
 		{
 			Id = CardCompletedEventId,
-			Name = "Card completed",
-			Description = "Raised when this integration completes a card on the Task Board.",
+			Name = Strings.Events.CardCompleted.Name(),
+			Description = Strings.Events.CardCompleted.Description(),
 			PayloadParameters =
 			[
-				ActionParameter.Text("cardId", "Card id"),
-				ActionParameter.Text("title", "Title")
+				ActionParameter.Text("cardId", Strings.Events.CardCompleted.CardId.Label()),
+				ActionParameter.Text("title", Strings.Events.CardCompleted.Title.Label())
 			]
 		}
 	];
@@ -173,10 +176,10 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 				new IntegrationIssue
 				{
 					Id = NotConfiguredIssueId,
-					Title = "Task Board is not configured",
-					Description = "Add the server URL and a token to start using the integration.",
+					Title = Strings.Issues.NotConfigured.Title(),
+					Description = Strings.Issues.NotConfigured.Description(),
 					Severity = IntegrationIssueSeverity.Error,
-					ActionLabel = "Configure"
+					ActionLabel = Strings.Issues.NotConfigured.Action()
 				}
 			];
 		}
@@ -193,10 +196,10 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 				new IntegrationIssue
 				{
 					Id = UnauthorizedIssueId,
-					Title = "The Task Board token is no longer valid",
-					Description = "The server rejected the stored token. Sign in again to replace it.",
+					Title = Strings.Issues.Unauthorized.Title(),
+					Description = Strings.Issues.Unauthorized.Description(),
 					Severity = IntegrationIssueSeverity.Error,
-					ActionLabel = "Sign in again"
+					ActionLabel = Strings.Issues.Unauthorized.Action()
 				}
 			];
 		}
@@ -207,10 +210,10 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 				new IntegrationIssue
 				{
 					Id = UnreachableIssueId,
-					Title = "The Task Board server did not answer",
-					Description = exception.Message,
+					Title = Strings.Issues.Unreachable.Title(),
+					Description = exception.UserMessage,
 					Severity = IntegrationIssueSeverity.Warning,
-					ActionLabel = "Retry"
+					ActionLabel = Strings.Issues.Unreachable.Action()
 				}
 			];
 		}
@@ -231,11 +234,11 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 			case UnreachableIssueId:
 				var failure = await RefreshAsync(cancellationToken);
 				return failure is null
-					? IssueResolution.Ok("The Task Board server answered again.")
-					: IssueResolution.Failed(failure.Message);
+					? IssueResolution.Ok(Strings.Issues.Unreachable.Resolved())
+					: IssueResolution.Failed(failure.UserMessage);
 
 			default:
-				return IssueResolution.Failed($"Unknown issue '{issueId}'.");
+				return IssueResolution.Failed(Strings.Issues.Unknown(issueId));
 		}
 	}
 }

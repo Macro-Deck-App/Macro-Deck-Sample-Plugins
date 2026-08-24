@@ -7,9 +7,37 @@
   "description": "A plugin-owned virtual profile with widget interactions, plus the host callback APIs: deck navigation, widget appearance, scripts, variables and notifications.",
   "icon": "Assets/icon.svg",
   "entrypoints": {
-    "win-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin.exe" },
-    "osx-arm64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" },
-    "osx-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" },
-    "linux-x64": { "executable": "MacroDeck.SampleVirtualProfilePlugin" }
-  }
+    "win-x64": {
+      "executable": "runtimes/win-x64/MacroDeck.SampleVirtualProfilePlugin.exe"
+    },
+    "osx-arm64": {
+      "executable": "runtimes/osx-arm64/MacroDeck.SampleVirtualProfilePlugin"
+    },
+    "osx-x64": {
+      "executable": "runtimes/osx-x64/MacroDeck.SampleVirtualProfilePlugin"
+    },
+    "linux-x64": {
+      "executable": "runtimes/linux-x64/MacroDeck.SampleVirtualProfilePlugin"
+    }
+  },
+  "publisher": {
+    "name": "Macro Deck",
+    "id": "app.macro-deck",
+    "url": "https://macro-deck.app"
+  },
+  "license": "MIT",
+  "homepage": "https://docs.macro-deck.app/introduction/samples-and-template/",
+  "repository": "https://github.com/Macro-Deck-App/Macro-Deck-Sample-Plugins",
+  "compatibility": {
+    "macroDeck": ">=3.0.0"
+  },
+  "permissions": [
+    "host:deck",
+    "host:widgets",
+    "host:scripts",
+    "host:variables",
+    "host:notifications",
+    "host:action-interactions",
+    "events:publish"
+  ]
 }

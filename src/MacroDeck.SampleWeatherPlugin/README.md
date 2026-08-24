@@ -3,7 +3,7 @@
 The smallest complete plugin: one integration covering actions, variables, an event, a config flow and
 a provider capability, with everything reading the same synthetic weather reading. Start here if you
 have not written a Macro Deck plugin before, then read
-[`plugin-hosting.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/plugin-hosting.md)
+[hosting guide](https://docs.macro-deck.app/sdk/hosting/)
 for the builder API and the registration modes this assumes.
 
 It needs no external service: the station computes its reading from a running counter, so the plugin
@@ -26,6 +26,9 @@ builds, runs and tests without credentials or network access.
 - **`ConfigFlow/LocationConfigFlow.cs`** - deliberately the contract's floor: one step, one required
   field. See the REST API sample for a multi-step flow with secrets and OAuth.
 - **`Assets/icon.svg`** - declared by `manifest.json`; the plugin's own code never touches it.
+- **`Localization/Strings.resx`** and **`Localization/Strings.de.resx`** - every string a user reads.
+  This is the one sample that ships a translation, so it is also where the fallback chain and the
+  manifest's derived `languages` field are visible.
 
 ## Running it against a local host
 
@@ -50,4 +53,17 @@ dotnet test tests/MacroDeck.SampleWeatherPlugin.Tests
 
 ```bash
 macrodeck-plugin test --project src/MacroDeck.SampleWeatherPlugin
+```
+
+## Packaging it
+
+`macrodeck-build.json` names one self-contained `dotnet publish` per platform, and the manifest's
+entrypoints name what that publish actually produces:
+
+```bash
+macrodeck-plugin build --output ./artifacts
+```
+
+```bash
+macrodeck-plugin validate --artifact ./artifacts/app.macro-deck.sample-weather-1.0.0.macroDeckPlugin --level Publication
 ```

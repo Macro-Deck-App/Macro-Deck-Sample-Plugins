@@ -1,6 +1,7 @@
 using MacroDeck.Plugin.Hosting;
 using MacroDeck.Plugin.Protocol.Capabilities.Actions;
 using MacroDeck.Plugin.Protocol.Capabilities.Weather;
+using MacroDeck.Plugin.Serilog;
 using MacroDeck.Plugin.Testing;
 using NUnit.Framework;
 
@@ -21,6 +22,7 @@ public sealed class WeatherOverTheWireTests
 	{
 		var builder = MacroDeckPlugin.CreatePlugin()
 			.UseMacroDeckLogging()
+			.UseLocalization(Strings.LocalizationCatalog)
 			.RegisterIntegration<WeatherIntegration>();
 
 		await using var host = await MacroDeckTestHost.StartAsync();
@@ -40,6 +42,7 @@ public sealed class WeatherOverTheWireTests
 	{
 		var builder = MacroDeckPlugin.CreatePlugin()
 			.UseMacroDeckLogging()
+			.UseLocalization(Strings.LocalizationCatalog)
 			.RegisterIntegration<WeatherIntegration>();
 
 		await using var host = await MacroDeckTestHost.StartAsync();

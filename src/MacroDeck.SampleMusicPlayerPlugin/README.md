@@ -25,6 +25,9 @@ capabilities. Read it when your plugin drives something that plays media.
 Catalogue and device reads are the one place a failure must *throw* rather than degrade to an empty
 result: "nothing found" and "could not load" have to look different in the UI. Everything else here
 degrades - see the parity matrix.
+- **`Localization/Strings.resx`** - every string a user reads. The `Fields.*` group is shared by
+  several actions and the event rather than repeated per action, and a track title, playlist name or
+  device name stays a literal: it is content, already in its final form.
 
 ## Running it against a local host
 
@@ -42,3 +45,16 @@ dotnet test tests/MacroDeck.SampleMusicPlayerPlugin.Tests
 `MusicPlayerIntegrationTests` drives the capability directly and advances `harness.Clock` to prove the
 position tracks the clock; `MusicPlayerOverTheWireTests` covers what changes shape on the wire - the
 position, the enums and the artwork bytes.
+
+## Packaging it
+
+`macrodeck-build.json` names one self-contained `dotnet publish` per platform, and the manifest's
+entrypoints name what that publish actually produces:
+
+```bash
+macrodeck-plugin build --output ./artifacts
+```
+
+```bash
+macrodeck-plugin validate --artifact ./artifacts/app.macro-deck.sample-music-player-1.0.0.macroDeckPlugin --level Publication
+```

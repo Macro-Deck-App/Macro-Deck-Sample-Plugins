@@ -57,8 +57,7 @@ public sealed class TaskBoardClient(HttpClient httpClient, TaskBoardCredentials 
 		using var response = await SendCoreAsync(message, cancellationToken);
 
 		var payload = await response.Content.ReadFromJsonAsync<T>(cancellationToken);
-		return payload ?? throw new TaskBoardException(TaskBoardFailure.ServerError,
-			"The Task Board API answered with an empty body.");
+		return payload ?? throw TaskBoardException.EmptyBody();
 	}
 
 	private async Task<HttpResponseMessage> SendCoreAsync(HttpRequestMessage message, CancellationToken cancellationToken)
@@ -71,11 +70,11 @@ public sealed class TaskBoardClient(HttpClient httpClient, TaskBoardCredentials 
 		catch (TaskCanceledException exception) when (!cancellationToken.IsCancellationRequested)
 		{
 			// A cancelled request the caller did not cancel is the client's own timeout.
-			throw new TaskBoardException(TaskBoardFailure.Timeout, "The Task Board API did not answer in time.", exception);
+			throw TaskBoardException.Timeout(exception);
 		}
 		catch (HttpRequestException exception)
 		{
-			throw new TaskBoardException(TaskBoardFailure.Unreachable, "The Task Board API is unreachable.", exception);
+			throw TaskBoardException.Unreachable(exception);
 		}
 
 		if (!response.IsSuccessStatusCode)
@@ -92,7 +91,7 @@ public sealed class TaskBoardClient(HttpClient httpClient, TaskBoardCredentials 
 	{
 		if (credentials is not { BaseAddress: { } baseAddress, Token: { } token })
 		{
-			throw new TaskBoardException(TaskBoardFailure.NotConfigured, "The Task Board integration is not configured yet.");
+			throw TaskBoardException.NotConfigured();
 		}
 
 		var message = new HttpRequestMessage(method, new Uri(baseAddress, path));

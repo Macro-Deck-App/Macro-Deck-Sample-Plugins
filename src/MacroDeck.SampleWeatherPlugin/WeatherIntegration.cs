@@ -1,4 +1,5 @@
 using MacroDeck.Plugin.Hosting.Integrations;
+using MacroDeck.Plugin.Hosting.Integrations.HostApis;
 using MacroDeck.Plugin.Protocol.Handshake;
 using MacroDeck.SampleWeatherPlugin.Actions;
 using MacroDeck.SampleWeatherPlugin.ConfigFlow;
@@ -115,13 +116,13 @@ public sealed class WeatherIntegration : IPluginIntegration, IVariableProvider, 
 		new EventDefinition
 		{
 			Id = WeatherRefreshedEventId,
-			Name = "Weather refreshed",
-			Description = "Raised whenever the sample's synthetic weather reading changes.",
+			Name = Strings.Events.WeatherRefreshed.Name(),
+			Description = Strings.Events.WeatherRefreshed.Description(),
 			PayloadParameters =
 			[
-				ActionParameter.Number("temperatureCelsius", "Temperature (°C)"),
-				ActionParameter.Text("condition", "Condition"),
-				ActionParameter.Toggle("isAlert", "Above alert threshold")
+				ActionParameter.Number("temperatureCelsius", Strings.Events.WeatherRefreshed.Temperature.Label()),
+				ActionParameter.Text("condition", Strings.Events.WeatherRefreshed.Condition.Label()),
+				ActionParameter.Toggle("isAlert", Strings.Events.WeatherRefreshed.IsAlert.Label())
 			]
 		}
 	];

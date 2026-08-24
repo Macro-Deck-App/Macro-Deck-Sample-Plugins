@@ -52,6 +52,62 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  # Every sample, every platform Macro Deck ships for. `build` publishes the runtime identifier, packs
+  # it and validates the result, so a sample that no longer compiles for one platform - or whose
+  # manifest names an entrypoint the publish does not actually produce - fails here rather than in
+  # somebody's Macro Deck. Self-contained publishes cross-compile, so one Linux runner covers all four.
+  package:
+    name: Package ${{ matrix.plugin }} (${{ matrix.rid }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      # A plain cross product, so one platform breaking one sample fails only that job and the report
+      # names both halves. The runtime identifiers are the ones every sample's manifest declares.
+      matrix:
+        rid: [win-x64, osx-arm64, osx-x64, linux-x64]
+        plugin:
+          - MacroDeck.SampleWeatherPlugin
+          - MacroDeck.SampleMusicPlayerPlugin
+          - MacroDeck.SampleRestApiPlugin
+          - MacroDeck.SampleVirtualProfilePlugin
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('NuGet.config', 'Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Install Macro Deck tooling
+        uses: ./.github/actions/macrodeck-cli
+        with:
+          project: src/${{ matrix.plugin }}
+
+      - name: Build and pack
+        working-directory: src/${{ matrix.plugin }}
+        run: >
+          macrodeck-plugin build --rid "${{ matrix.rid }}"
+          --output "${{ github.workspace }}/artifacts" --force --no-color
+
+      # Publication readiness, not just "will it install": every field a published plugin is expected to
+      # carry is an error at this level, and the same check reports a declared entrypoint that is missing
+      # from the packed payload. It is the CLI's own validation rather than a copy of its rules here.
+      - name: Validate the artifact for publication
+        run: >
+          macrodeck-plugin validate --no-color --level Publication
+          --artifact "$(ls "${{ github.workspace }}"/artifacts/*.macroDeckPlugin)"
+
+      # The artifact itself is deliberately not uploaded. A self-contained publish is around 200 MB per
+      # sample per platform, and what this job exists to prove - that it builds, packs and validates -
+      # is already in its verdict. Run `macrodeck-plugin build` locally for an installable file.
+
   conformance:
     name: Macro Deck tooling (${{ matrix.name }})
     runs-on: ubuntu-latest
@@ -86,13 +142,10 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('NuGet.config', 'Directory.Packages.props', '**/*.csproj') }}
           restore-keys: nuget-${{ runner.os }}-
 
-      # Keep the developer CLI on the same release as the SDK packages consumed by the samples.
       - name: Install Macro Deck tooling
-        shell: bash
-        run: |
-          set -euo pipefail
-          version="$(dotnet msbuild "${{ matrix.project }}" -nologo -getProperty:MacroDeckSdkVersion)"
-          dotnet tool install --global MacroDeck.Plugin.Cli --version "${version}"
+        uses: ./.github/actions/macrodeck-cli
+        with:
+          project: ${{ matrix.project }}
 
       # --project deliberately lets the Macro Deck CLI build the plugin before driving a real
       # protocol session against it, rather than testing only an already-built assembly.

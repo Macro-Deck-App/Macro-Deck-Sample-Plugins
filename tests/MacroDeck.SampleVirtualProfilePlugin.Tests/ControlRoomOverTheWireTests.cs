@@ -1,5 +1,6 @@
 using MacroDeck.Plugin.Hosting;
 using MacroDeck.Plugin.Protocol.Capabilities.VirtualProfiles;
+using MacroDeck.Plugin.Serilog;
 using MacroDeck.Plugin.Testing;
 using NUnit.Framework;
 
@@ -17,6 +18,7 @@ public sealed class ControlRoomOverTheWireTests
 	{
 		var builder = MacroDeckPlugin.CreatePlugin()
 			.UseMacroDeckLogging()
+			.UseLocalization(Strings.LocalizationCatalog)
 			.RegisterIntegration<ControlRoomIntegration>();
 
 		await using var host = await MacroDeckTestHost.StartAsync();

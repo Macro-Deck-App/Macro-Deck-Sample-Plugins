@@ -32,6 +32,10 @@ Every round-trip callback here is wrapped: over the wire a `host.invoke` can be 
 or find no live connection, and throws `HostInvocationException` into the calling integration. An
 in-process integration never has to handle that - it is the one genuinely new failure mode a plugin
 gets, and ignoring it is the most common way a plugin breaks in the field.
+- **`Localization/Strings.resx`** - every string a user reads. `ControlRoomScenes.DisplayName` shows
+  where the line falls: an action's option label is a reference, while the same scene's name inside a
+  virtual widget's JSON payload, a host variable's value or a notification title stays a literal,
+  because those contracts take a plain string.
 
 ## Running it against a local host
 
@@ -49,3 +53,16 @@ dotnet test tests/MacroDeck.SampleVirtualProfilePlugin.Tests
 The harness tests seed the fake deck, widgets and scripts and then assert on what the plugin asked the
 host to do; the wire test proves a widget interaction - the one operation with no reply - actually
 arrived, by reading the profile back afterwards.
+
+## Packaging it
+
+`macrodeck-build.json` names one self-contained `dotnet publish` per platform, and the manifest's
+entrypoints name what that publish actually produces:
+
+```bash
+macrodeck-plugin build --output ./artifacts
+```
+
+```bash
+macrodeck-plugin validate --artifact ./artifacts/app.macro-deck.sample-virtual-profile-1.0.0.macroDeckPlugin --level Publication
+```

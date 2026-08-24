@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Plugin.Hosting.Transport;
 using MacroDeck.Sdk.Actions;
 
@@ -18,28 +19,29 @@ internal sealed class NavigateDeckAction(ControlRoomIntegration integration)
 
 	public string Id => "navigate-deck";
 
-	public string Name => "Navigate deck";
+	public LocalizedText Name => Strings.Actions.NavigateDeck.Name();
 
-	public string Description => "Opens a folder or profile on the client that triggered the action.";
+	public LocalizedText Description => Strings.Actions.NavigateDeck.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
 		ActionParameter.Choice("kind",
 			[
-				new ActionParameterOption { Value = FolderKind, Label = "Open folder" },
-				new ActionParameterOption { Value = ProfileKind, Label = "Switch profile" },
-				new ActionParameterOption { Value = ParentKind, Label = "Go to parent" },
-				new ActionParameterOption { Value = BackKind, Label = "Go back" }
+				new ActionParameterOption { Value = FolderKind, Label = Strings.NavigationKinds.Folder() },
+				new ActionParameterOption { Value = ProfileKind, Label = Strings.NavigationKinds.Profile() },
+				new ActionParameterOption { Value = ParentKind, Label = Strings.NavigationKinds.Parent() },
+				new ActionParameterOption { Value = BackKind, Label = Strings.NavigationKinds.Back() }
 			],
-			label: "Target",
+			label: Strings.Actions.NavigateDeck.Kind.Label(),
 			defaultValue: FolderKind,
 			required: true),
-		ActionParameter.DynamicChoice("targetId", label: "Folder or profile")
+		ActionParameter.DynamicChoice("targetId", label: Strings.Actions.NavigateDeck.TargetId.Label())
 			.OnlyWhen("kind", FolderKind, ProfileKind)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
 
+	/// <summary>A folder's or profile's label is the name the user gave it, so it stays a literal.</summary>
 	public Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 	{
 		var deck = integration.Context?.Deck;
@@ -56,7 +58,7 @@ internal sealed class NavigateDeckAction(ControlRoomIntegration integration)
 		{
 			if (integration.Context is not { } integrationContext)
 			{
-				return ActionResult.Failed(ActionErrorCodes.Unavailable, "The integration is not initialized.");
+				return ActionResult.Failed(ActionErrorCodes.Unavailable, Strings.Errors.NotInitialized());
 			}
 
 			var kind = context.Parameters.GetValueOrDefault("kind") as string ?? FolderKind;
@@ -64,7 +66,8 @@ internal sealed class NavigateDeckAction(ControlRoomIntegration integration)
 
 			if (kind is FolderKind or ProfileKind && string.IsNullOrWhiteSpace(targetId))
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "targetId is required for this target.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					Strings.Actions.NavigateDeck.MissingTarget());
 			}
 
 			try

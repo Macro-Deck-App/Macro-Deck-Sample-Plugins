@@ -252,7 +252,8 @@ public sealed class ControlRoomIntegrationTests
 		var succeeded = await harness.Actions.ExecuteAsync("run-script", new Dictionary<string, object?> { ["scriptId"] = "script-1" });
 		var failed = await harness.Actions.ExecuteAsync("run-script", new Dictionary<string, object?> { ["scriptId"] = "script-2" });
 
-		Assert.That(options!.Options.Select(option => option.Label), Is.EquivalentTo(_scriptNames));
+		// A script's name is the one the user gave it, so it stays a literal all the way onto the wire.
+		Assert.That(options!.Options.Select(option => option.Label?.Literal), Is.EquivalentTo(_scriptNames));
 		Assert.That(succeeded.Succeeded, Is.True);
 		Assert.That(harness.Context.Scripts.Ran, Does.Contain("script-1"));
 		Assert.That(failed.Succeeded, Is.False);
@@ -274,7 +275,9 @@ public sealed class ControlRoomIntegrationTests
 
 		var call = harness.Context.Deck.Calls.Single();
 
-		Assert.That(options!.Options.Single().Label, Is.EqualTo("Studio"));
+		// A folder label is the user's own text, so it travels as a literal rather than as a reference
+		// a client would resolve - which is exactly what Literal reads back.
+		Assert.That(options!.Options.Single().Label?.Literal, Is.EqualTo("Studio"));
 		Assert.That(outcome.Succeeded, Is.True);
 		Assert.That(call.Id, Is.EqualTo("folder-1"));
 		Assert.That(call.OriginClientId, Is.EqualTo("client-3"));
@@ -312,7 +315,9 @@ public sealed class ControlRoomIntegrationTests
 
 	private static async Task<PluginTestHarness> CreateAsync()
 	{
-		var harness = PluginTestHarness.Create(builder => builder.RegisterIntegration<ControlRoomIntegration>());
+		var harness = PluginTestHarness.Create(builder => builder
+			.UseLocalization(Strings.LocalizationCatalog)
+			.RegisterIntegration<ControlRoomIntegration>());
 		await harness.InitializeIntegrationsAsync();
 		return harness;
 	}

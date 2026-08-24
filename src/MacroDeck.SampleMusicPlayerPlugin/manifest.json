@@ -7,9 +7,32 @@
   "description": "Synthetic music player: transport controls, artwork, catalogue browsing, output devices, two instances, plus actions, variables and events on the same playback state.",
   "icon": "Assets/icon.svg",
   "entrypoints": {
-    "win-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin.exe" },
-    "osx-arm64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" },
-    "osx-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" },
-    "linux-x64": { "executable": "MacroDeck.SampleMusicPlayerPlugin" }
-  }
+    "win-x64": {
+      "executable": "runtimes/win-x64/MacroDeck.SampleMusicPlayerPlugin.exe"
+    },
+    "osx-arm64": {
+      "executable": "runtimes/osx-arm64/MacroDeck.SampleMusicPlayerPlugin"
+    },
+    "osx-x64": {
+      "executable": "runtimes/osx-x64/MacroDeck.SampleMusicPlayerPlugin"
+    },
+    "linux-x64": {
+      "executable": "runtimes/linux-x64/MacroDeck.SampleMusicPlayerPlugin"
+    }
+  },
+  "publisher": {
+    "name": "Macro Deck",
+    "id": "app.macro-deck",
+    "url": "https://macro-deck.app"
+  },
+  "license": "MIT",
+  "homepage": "https://docs.macro-deck.app/introduction/samples-and-template/",
+  "repository": "https://github.com/Macro-Deck-App/Macro-Deck-Sample-Plugins",
+  "compatibility": {
+    "macroDeck": ">=3.0.0"
+  },
+  "permissions": [
+    "host:variables",
+    "events:publish"
+  ]
 }

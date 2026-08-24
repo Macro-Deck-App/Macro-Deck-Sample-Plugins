@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.ConfigFlow;
 
@@ -27,28 +28,32 @@ internal sealed class LocationConfigFlow : IConfigFlow
 	{
 		if (!string.Equals(stepId, StepId, StringComparison.Ordinal))
 		{
-			return Task.FromResult(ConfigFlowResult.Error(BuildStep(), "Unknown step."));
+			return Task.FromResult(ConfigFlowResult.Error(BuildStep(), Strings.ConfigFlow.Location.UnknownStep()));
 		}
 
 		if (input.GetValueOrDefault(LocationFieldName) is not string { Length: > 0 } location)
 		{
+			var required = MacroDeckStrings.Validation.Required(Strings.ConfigFlow.Location.LocationName.Label());
+
 			return Task.FromResult(ConfigFlowResult.Error(BuildStep(),
-				"Enter a location name.",
-				new Dictionary<string, string> { [LocationFieldName] = "Required." }));
+				required,
+				new Dictionary<string, LocalizedText> { [LocationFieldName] = required }));
 		}
 
+		// Deliberately a plain string, not a LocalizedText: the host stores the entry title as its name
+		// and the user renames it from there, so it is written once in the plugin's own language.
 		return Task.FromResult(ConfigFlowResult.Complete($"Weather ({location})"));
 	}
 
 	private static ConfigFlowStep BuildStep() => new()
 	{
 		StepId = StepId,
-		Title = "Sample location",
-		Description = "Pick the location the sample's synthetic weather station reports for.",
+		Title = Strings.ConfigFlow.Location.Title(),
+		Description = Strings.ConfigFlow.Location.Description(),
 		Fields =
 		[
 			ActionParameter.Text(LocationFieldName,
-				label: "Location name",
+				label: Strings.ConfigFlow.Location.LocationName.Label(),
 				defaultValue: "Berlin, Germany",
 				required: true)
 		]

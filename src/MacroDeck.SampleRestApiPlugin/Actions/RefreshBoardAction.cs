@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleRestApiPlugin.Actions;
@@ -7,9 +8,9 @@ internal sealed class RefreshBoardAction(RestApiIntegration integration) : IActi
 {
 	public string Id => "refresh-board";
 
-	public string Name => "Refresh board";
+	public LocalizedText Name => Strings.Actions.RefreshBoard.Name();
 
-	public string Description => "Re-reads the open cards from the Task Board.";
+	public LocalizedText Description => Strings.Actions.RefreshBoard.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } = [];
 

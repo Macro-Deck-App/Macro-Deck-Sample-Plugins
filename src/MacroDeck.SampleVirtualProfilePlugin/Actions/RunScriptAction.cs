@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Plugin.Hosting.Transport;
 using MacroDeck.Sdk.Actions;
 
@@ -13,17 +14,18 @@ internal sealed class RunScriptAction(ControlRoomIntegration integration)
 {
 	public string Id => "run-script";
 
-	public string Name => "Run script";
+	public LocalizedText Name => Strings.Actions.RunScript.Name();
 
-	public string Description => "Runs a script configured in Macro Deck.";
+	public LocalizedText Description => Strings.Actions.RunScript.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("scriptId", label: "Script", required: true)
+		ActionParameter.DynamicChoice("scriptId", label: Strings.Actions.RunScript.Script.Label(), required: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
 
+	/// <summary>A script's name is the one the user gave it, so the option label is a literal.</summary>
 	public Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 	{
 		var scripts = integration.Context?.Scripts.GetScripts() ?? [];
@@ -39,19 +41,25 @@ internal sealed class RunScriptAction(ControlRoomIntegration integration)
 		{
 			if (integration.Context is not { } integrationContext)
 			{
-				return ActionResult.Failed(ActionErrorCodes.Unavailable, "The integration is not initialized.");
+				return ActionResult.Failed(ActionErrorCodes.Unavailable, Strings.Errors.NotInitialized());
 			}
 
 			if (context.Parameters.GetValueOrDefault("scriptId") is not string { Length: > 0 } scriptId)
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "scriptId is required.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.Required(Strings.Actions.RunScript.Script.Label()));
 			}
 
 			try
 			{
 				// The script's own result is this action's result: a failing script must not look like a
 				// successful button press.
-				return await integrationContext.Scripts.RunAsync(scriptId, context.OriginClientId, context.CancellationToken);
+				// ownerWidgetId is what a script declaring RunsOnWidget resolves "this widget" to, so passing
+				// the triggering widget through is what makes such a script runnable from a deck button.
+				return await integrationContext.Scripts.RunAsync(scriptId,
+					originClientId: context.OriginClientId,
+					ownerWidgetId: context.OwnerWidgetId,
+					cancellationToken: context.CancellationToken);
 			}
 			catch (HostInvocationException exception)
 			{

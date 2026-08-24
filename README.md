@@ -1,8 +1,13 @@
 # Macro Deck sample plugins
 
 Worked examples of out-of-process Macro Deck 3 plugins. They build against the published SDK packages
-(`MacroDeck.Sdk`, `MacroDeck.Plugin.Hosting`, `MacroDeck.Plugin.Serilog`), so the Macro Deck source
-tree is not needed to build them - only to run a host against them during development.
+(`MacroDeck.Sdk`, `MacroDeck.Plugin.Hosting`, `MacroDeck.Plugin.Serilog`, `MacroDeck.Localization`),
+so the Macro Deck source tree is not needed to build them - only to run a host against them during
+development.
+
+They are laid out exactly the way `macrodeck-plugin new` scaffolds a plugin, so anything true of a
+sample here is true of a project you create yourself: the same `manifest.json` fields, the same
+`macrodeck-build.json`, the same `Localization/` resource set.
 
 Each sample is one coherent, self-contained integration rather than a pile of snippets: its actions,
 variables, events and providers read the same state, so what a widget shows and what a variable says
@@ -22,7 +27,7 @@ it is the same shape, set up to be renamed and stripped down.
 ## Capability coverage
 
 Which sample demonstrates what, against the
-[capability parity matrix](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/capability-parity.md).
+[capability parity matrix](https://docs.macro-deck.app/sdk/capability-parity/).
 Use it as the checklist when the Plugin API grows: a new capability belongs in an existing sample, or
 in a new one.
 
@@ -46,6 +51,7 @@ in a new one.
 | Deck navigation, widgets, scripts, notifications | | | ● (notifications) | ● |
 | Action interaction pickers | | ● | | |
 | `state.update` catalogue invalidation | ● | | | ● |
+| Localized text (`Localization/*.resx`) | ● (en, de) | ● (en) | ● (en) | ● (en) |
 
 Two contracts have no sample on purpose:
 
@@ -58,6 +64,15 @@ Two contracts have no sample on purpose:
 
 - .NET SDK 10.0
 - A running Macro Deck desktop app for interactive debugging
+- [`macrodeck-plugin`](https://docs.macro-deck.app/cli/) to pack, validate or conformance-test a
+  sample - not needed for `dotnet build` or `dotnet test`
+
+```bash
+dotnet tool install --global MacroDeck.Plugin.Cli --version 3.0.0-preview.6
+```
+
+Keep the CLI on the same release as the SDK packages the samples resolve; CI derives the version from
+`MacroDeckSdkVersion` so the two cannot drift apart there.
 
 ## Quick start
 
@@ -156,7 +171,7 @@ CLI remains useful for the non-interactive conformance check below.
 ## Testing
 
 Every sample has a test project next to it, built on
-[`MacroDeck.Plugin.Testing`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/testing-plugins.md) -
+[`MacroDeck.Plugin.Testing`](https://docs.macro-deck.app/sdk/testing/) -
 the same package a plugin author is expected to test their own plugin with. The three subjects it
 offers are used where each belongs, so the suite doubles as a worked example of how to test a plugin:
 
@@ -169,12 +184,75 @@ offers are used where each belongs, so the suite doubles as a worked example of 
 The REST API sample's tests plug a deterministic fake server in as the typed client's primary handler
 (`FakeTaskBoardApi.cs`), so the plugin's own request building and JSON parsing still run for real.
 
-The [conformance suite](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/conformance.md)
+The [conformance suite](https://docs.macro-deck.app/sdk/conformance/)
 checks a plugin against the protocol contract itself, and every sample passes it:
 
 ```bash
 macrodeck-plugin test --project src/MacroDeck.SampleWeatherPlugin
 ```
+
+## Localization
+
+Every string a user reads comes from `Localization/Strings.resx` rather than from a literal:
+action names and descriptions, parameter labels and placeholders, event metadata, config-flow text,
+integration issues and the failure messages an action reports. `MacroDeck.Plugin.Analyzers` generates
+a typed `Strings` class from the resource set, `Program.cs` registers the generated catalog with
+`UseLocalization`, and the host resolves each reference in the reader's own language.
+
+```csharp
+public LocalizedText Name => Strings.Actions.RefreshWeather.Name();
+```
+
+Three rules the samples follow, and the reason for each:
+
+- **Generic wording comes from `MacroDeckStrings`, not from a plugin's own catalog.**
+  `MacroDeckStrings.Validation.Required(label)` is already translated everywhere else in the app;
+  a duplicate `Required` key would be one more string every translator has to keep in sync.
+- **Content stays a literal.** A track title, a folder name, a card's title on a remote board and a
+  device's own name are already in their final form - there is nothing to translate about them, and
+  wrapping them in a reference would only make the wire noisier.
+- **A few contracts still take a plain string**, and the samples say so where they do:
+  `ConfigFlowResult.Complete`'s entry title (the user renames it afterwards),
+  `UserNotificationRequest`, `VirtualProfileDescriptor.Name` and an action interaction's `prompt`.
+
+The weather sample ships a second language (`Localization/Strings.de.resx`) so the fallback chain and
+the manifest's derived `languages` field are visible somewhere in this repository; the other three
+ship English only, which is the minimum a plugin needs. You never hand-write `languages` - `build`
+and `pack` derive it from the resource set.
+
+Each test project has a `LocalizationTests.cs` guarding the wiring rather than the wording: the
+catalog is scoped to the plugin id, English is the default culture, every declared key resolves to
+text, and every culture carries every key the default language declares.
+
+## Packaging for all three platforms
+
+Each sample carries a `macrodeck-build.json` beside its manifest naming one self-contained
+`dotnet publish` per runtime identifier, exactly as `macrodeck-plugin new` writes it. One command
+builds every declared platform and packs the result:
+
+```bash
+macrodeck-plugin build --output ./artifacts
+```
+
+Add `--rid win-x64` to build a single platform - that is what CI does, one job per sample per
+platform. Self-contained publishes cross-compile, so a Linux runner (or a Mac) produces the Windows
+and macOS artifacts too.
+
+Manifest entrypoints therefore name what the publish actually produces - `runtimes/win-x64/<project>.exe`
+on Windows and `runtimes/<rid>/<project>` elsewhere - rather than a bare file name. Nothing here is
+framework-dependent, so no entrypoint declares a `runtime` block and none of them ends in `.dll`.
+
+The sample manifests are publication-ready rather than schema-minimal: alongside the fields the host
+needs to run a plugin they declare `publisher`, `license`, `homepage`, `repository`, `compatibility`
+and the `permissions` each sample actually uses. CI gates on that:
+
+```bash
+macrodeck-plugin validate --artifact ./artifacts/<id>-<version>.macroDeckPlugin --level Publication
+```
+
+At `Publication` level a missing publication field is an error rather than a warning, and the same
+check reports a declared entrypoint that is not present in the packed payload - which is what stops a
+manifest and its build output from drifting apart again.
 
 ## Building against a local SDK build
 
@@ -201,12 +279,16 @@ name of a published one.
 
 ## Further reading
 
-- [Plugin development docs](https://github.com/Macro-Deck-App/Macro-Deck-3/tree/main/docs/plugin-development)
-- [`plugin-hosting.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/plugin-hosting.md) - the builder API, registration modes, the artifact format and every `MACRO_DECK_PLUGIN_*` variable
-- [`sdk-reference.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/sdk-reference.md) - every interface and record you build against
-- [`testing-plugins.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/testing-plugins.md) - the test harness, the fakes and the manual clock
-- [`capability-parity.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/capability-parity.md) - where a plugin differs from an in-process integration, and why
-- [`conformance.md`](https://github.com/Macro-Deck-App/Macro-Deck-3/blob/main/docs/plugin-development/conformance.md) - the conformance suite and its check ids
+- [Plugin development docs](https://docs.macro-deck.app/) - the whole set
+- [Hosting](https://docs.macro-deck.app/sdk/hosting/) - the builder API, registration modes and every `MACRO_DECK_PLUGIN_*` variable
+- [SDK reference](https://docs.macro-deck.app/sdk/) - every interface and record you build against
+- [Localization](https://docs.macro-deck.app/sdk/localization/) - the resource set, the generated API and the MDLOC diagnostics
+- [Manifest reference](https://docs.macro-deck.app/reference/manifest/) - every field, and whether it is required to run or to publish
+- [CLI](https://docs.macro-deck.app/cli/) - `new`, `build`, `pack`, `validate`, `test` and their exit codes
+- [Testing](https://docs.macro-deck.app/sdk/testing/) - the test harness, the fakes and the manual clock
+- [Capability parity](https://docs.macro-deck.app/sdk/capability-parity/) - where a plugin differs from an in-process integration, and why
+- [Conformance](https://docs.macro-deck.app/sdk/conformance/) - the conformance suite and its check ids
+- [Publishing](https://docs.macro-deck.app/guides/publishing/) - what a plugin needs before it can be published
 
 ## License
 

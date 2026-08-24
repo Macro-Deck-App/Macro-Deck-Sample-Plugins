@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- The default-language file. Every translation is checked against it and the fallback chain ends
+       here, so it is required even for a plugin that ships one language. Add a language by adding
+       Localization/Strings.<culture>.resx beside it (Strings.de.resx, Strings.pt-BR.resx).
+       A dotted key becomes a nested class: Actions.Foo.Name is Strings.Actions.Foo.Name(). -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions.SetScene.Name" xml:space="preserve">
+    <value>Set scene</value>
+  </data>
+  <data name="Actions.SetScene.Description" xml:space="preserve">
+    <value>Switches the sample control room to another scene.</value>
+  </data>
+  <data name="Actions.SetScene.Scene.Label" xml:space="preserve">
+    <value>Scene</value>
+  </data>
+  <data name="Actions.StyleWidget.Name" xml:space="preserve">
+    <value>Style widget</value>
+  </data>
+  <data name="Actions.StyleWidget.Description" xml:space="preserve">
+    <value>Applies a label and colours to a widget, or resets them.</value>
+  </data>
+  <data name="Actions.StyleWidget.Widget.Label" xml:space="preserve">
+    <value>Widget</value>
+  </data>
+  <data name="Actions.StyleWidget.LabelText.Label" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="Actions.StyleWidget.Background.Label" xml:space="preserve">
+    <value>Background</value>
+  </data>
+  <data name="Actions.StyleWidget.Icon.Label" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="Actions.StyleWidget.State.Label" xml:space="preserve">
+    <value>Apply to</value>
+  </data>
+  <data name="Actions.StyleWidget.NoWidget" xml:space="preserve">
+    <value>Pick a widget: this run has no widget of its own to style.</value>
+  </data>
+  <data name="Actions.StyleWidget.UnknownWidget" xml:space="preserve">
+    <value>The host does not know widget {widgetId}.</value>
+  </data>
+  <data name="WidgetStates.Current" xml:space="preserve">
+    <value>Current state</value>
+  </data>
+  <data name="WidgetStates.All" xml:space="preserve">
+    <value>All states</value>
+  </data>
+  <data name="Actions.Announce.Name" xml:space="preserve">
+    <value>Announce</value>
+  </data>
+  <data name="Actions.Announce.Description" xml:space="preserve">
+    <value>Shows a notification in the Macro Deck app.</value>
+  </data>
+  <data name="Actions.Announce.Title.Label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Actions.Announce.Message.Label" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Actions.Announce.Message.Placeholder" xml:space="preserve">
+    <value>Optional details</value>
+  </data>
+  <data name="Actions.Announce.Level.Label" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="Actions.Announce.Key.Label" xml:space="preserve">
+    <value>Replace key</value>
+  </data>
+  <data name="Actions.Announce.Key.Description" xml:space="preserve">
+    <value>Notifications sharing a key replace each other instead of piling up.</value>
+  </data>
+  <data name="NotificationLevels.Info" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="NotificationLevels.Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="NotificationLevels.Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Actions.RunScript.Name" xml:space="preserve">
+    <value>Run script</value>
+  </data>
+  <data name="Actions.RunScript.Description" xml:space="preserve">
+    <value>Runs a script configured in Macro Deck.</value>
+  </data>
+  <data name="Actions.RunScript.Script.Label" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="Actions.NavigateDeck.Name" xml:space="preserve">
+    <value>Navigate deck</value>
+  </data>
+  <data name="Actions.NavigateDeck.Description" xml:space="preserve">
+    <value>Opens a folder or profile on the client that triggered the action.</value>
+  </data>
+  <data name="Actions.NavigateDeck.Kind.Label" xml:space="preserve">
+    <value>Target</value>
+  </data>
+  <data name="Actions.NavigateDeck.TargetId.Label" xml:space="preserve">
+    <value>Folder or profile</value>
+  </data>
+  <data name="Actions.NavigateDeck.MissingTarget" xml:space="preserve">
+    <value>Pick the folder or profile to open.</value>
+  </data>
+  <data name="NavigationKinds.Folder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="NavigationKinds.Profile" xml:space="preserve">
+    <value>Switch profile</value>
+  </data>
+  <data name="NavigationKinds.Parent" xml:space="preserve">
+    <value>Go to parent</value>
+  </data>
+  <data name="NavigationKinds.Back" xml:space="preserve">
+    <value>Go back</value>
+  </data>
+  <data name="Scenes.Live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="Scenes.Standby" xml:space="preserve">
+    <value>Standby</value>
+  </data>
+  <data name="Scenes.Break" xml:space="preserve">
+    <value>Break</value>
+  </data>
+  <data name="Scenes.Offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="Events.SceneChanged.Name" xml:space="preserve">
+    <value>Scene changed</value>
+  </data>
+  <data name="Events.SceneChanged.Description" xml:space="preserve">
+    <value>Raised when the control room switches to another scene.</value>
+  </data>
+  <data name="Events.SceneChanged.Scene.Label" xml:space="preserve">
+    <value>Scene</value>
+  </data>
+  <data name="Events.SceneChanged.IsLive.Label" xml:space="preserve">
+    <value>On air</value>
+  </data>
+  <data name="Events.SceneChanged.Source.Label" xml:space="preserve">
+    <value>Triggered by</value>
+  </data>
+  <data name="Errors.NotInitialized" xml:space="preserve">
+    <value>The integration is not initialized.</value>
+  </data>
+</root>

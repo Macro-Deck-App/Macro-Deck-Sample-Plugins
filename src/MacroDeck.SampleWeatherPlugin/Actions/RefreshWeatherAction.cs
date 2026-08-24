@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleWeatherPlugin.Actions;
@@ -12,9 +13,9 @@ internal sealed class RefreshWeatherAction(WeatherIntegration integration) : IAc
 {
 	public string Id => "refresh-weather";
 
-	public string Name => "Refresh weather";
+	public LocalizedText Name => Strings.Actions.RefreshWeather.Name();
 
-	public string Description => "Advances the sample's synthetic weather reading and republishes it.";
+	public LocalizedText Description => Strings.Actions.RefreshWeather.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } = [];
 

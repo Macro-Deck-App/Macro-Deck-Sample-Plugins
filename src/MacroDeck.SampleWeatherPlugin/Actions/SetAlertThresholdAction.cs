@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleWeatherPlugin.Actions;
@@ -14,15 +15,20 @@ internal sealed class SetAlertThresholdAction(WeatherIntegration integration) : 
 
 	public string Id => "set-alert-threshold";
 
-	public string Name => "Set alert threshold";
+	public LocalizedText Name => Strings.Actions.SetAlertThreshold.Name();
 
-	public string Description => "Sets the temperature (°C) above which weather-refreshed events report isAlert.";
+	public LocalizedText Description => Strings.Actions.SetAlertThreshold.Description();
 
 	public string SliderValueParameter => "thresholdCelsius";
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.Slider("thresholdCelsius", Min, Max, label: "Alert threshold (°C)", step: 1, defaultValue: 30)
+		ActionParameter.Slider("thresholdCelsius",
+			Min,
+			Max,
+			label: Strings.Actions.SetAlertThreshold.Threshold.Label(),
+			step: 1,
+			defaultValue: 30)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -38,8 +44,10 @@ internal sealed class SetAlertThresholdAction(WeatherIntegration integration) : 
 		{
 			if (context.Parameters.GetValueOrDefault("thresholdCelsius") is not double threshold)
 			{
+				// Generic validation wording comes from Macro Deck's own catalog rather than from a key of
+				// this plugin's, so a translator never re-translates a sentence the app already ships.
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"thresholdCelsius must be a number."));
+					MacroDeckStrings.Validation.InvalidValue(Strings.Actions.SetAlertThreshold.Threshold.Label())));
 			}
 
 			integration.AlertThresholdCelsius = threshold;

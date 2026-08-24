@@ -158,11 +158,15 @@ public sealed class MusicPlayerIntegrationTests
 	{
 		await using var harness = await CreateAsync();
 
-		await harness.MusicPlayer.PlayItemAsync(new MusicPlayerPlayItemArguments
+		var played = await harness.MusicPlayer.PlayItemAsync(new MusicPlayerPlayItemArguments
 		{
 			InstanceId = LibraryId,
 			Item = new MusicPlayerCatalogItemDto { Id = "playlist-evening", Title = "Evening", Kind = "Playlist" }
 		});
+
+		// Asserted, not assumed: a player that does not declare ICatalogMusicPlayer is refused play-item
+		// outright, and reading only the state afterwards would report that as "started the wrong track".
+		Assert.That(played.Succeeded, Is.True);
 
 		var state = await StateAsync(harness, LibraryId);
 		Assert.That(state.TrackName, Is.EqualTo("Night Transit"));
@@ -322,7 +326,9 @@ public sealed class MusicPlayerIntegrationTests
 
 	private static async Task<PluginTestHarness> CreateAsync()
 	{
-		var harness = PluginTestHarness.Create(builder => builder.RegisterIntegration<MusicPlayerIntegration>());
+		var harness = PluginTestHarness.Create(builder => builder
+			.UseLocalization(Strings.LocalizationCatalog)
+			.RegisterIntegration<MusicPlayerIntegration>());
 		await harness.InitializeIntegrationsAsync();
 		return harness;
 	}

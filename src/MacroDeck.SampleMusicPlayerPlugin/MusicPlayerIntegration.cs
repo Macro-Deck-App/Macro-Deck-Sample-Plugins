@@ -104,19 +104,19 @@ public sealed class MusicPlayerIntegration : IPluginIntegration, IMusicPlayerPro
 		new EventDefinition
 		{
 			Id = TrackChangedEventId,
-			Name = "Track changed",
-			Description = "Raised when a player moves to another track.",
+			Name = Strings.Events.TrackChanged.Name(),
+			Description = Strings.Events.TrackChanged.Description(),
 			// A configuration parameter narrows what the user subscribes to; its options come from
 			// GetEventOptionsAsync below rather than being fixed at declaration time.
 			ConfigurationParameters =
 			[
-				ActionParameter.DynamicChoice("player", label: "Player", required: true)
+				ActionParameter.DynamicChoice("player", label: Strings.Fields.Player.Label(), required: true)
 			],
 			PayloadParameters =
 			[
-				ActionParameter.Text("player", "Player"),
-				ActionParameter.Text("track", "Track"),
-				ActionParameter.Text("artist", "Artist")
+				ActionParameter.Text("player", Strings.Fields.Player.Label()),
+				ActionParameter.Text("track", Strings.Fields.Track.Label()),
+				ActionParameter.Text("artist", Strings.Fields.Artist.Label())
 			]
 		}
 	];
@@ -124,6 +124,8 @@ public sealed class MusicPlayerIntegration : IPluginIntegration, IMusicPlayerPro
 	public Task<DynamicOptionsResult> GetEventOptionsAsync(EventOptionsContext context, CancellationToken cancellationToken)
 		=> Task.FromResult(new DynamicOptionsResult { Options = InstanceOptions() });
 
+	/// <summary>An instance's display name is a plain string on the provider contract - it names a
+	/// configured account, not UI text - so it travels into the option as a literal.</summary>
 	internal IReadOnlyList<ActionParameterOption> InstanceOptions()
 		=> [.. GetInstances().Select(instance => new ActionParameterOption { Value = instance.Id, Label = instance.DisplayName })];
 

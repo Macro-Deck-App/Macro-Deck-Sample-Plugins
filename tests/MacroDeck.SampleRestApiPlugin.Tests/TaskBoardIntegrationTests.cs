@@ -34,6 +34,11 @@ public sealed class TaskBoardIntegrationTests
 		var outcome = await harness.Actions.ExecuteAsync("refresh-board");
 
 		Assert.That(outcome.Succeeded, Is.False);
+		// Text this plugin produces is a reference, not a sentence, so what a reader ends up seeing is
+		// decided by whoever resolves it. In this harness nothing does: there is no connection to
+		// negotiate a protocol version on, so the SDK flattens every reference against the plugin's own
+		// catalog in its own default language - which is only possible because the harness registers that
+		// catalog. Drop the UseLocalization call above and this assertion sees a blank message.
 		Assert.That(outcome.Error!.Message, Does.Contain("not configured"));
 	}
 
@@ -80,7 +85,7 @@ public sealed class TaskBoardIntegrationTests
 		var retried = (await harness.Issues.ResolveAsync(new IssueResolveArguments { IssueId = "unreachable" }))
 			.DataAs<IssueResolveResult>();
 		Assert.That(retried!.Success, Is.False);
-		Assert.That(retried.Message, Does.Contain("unreachable"));
+		Assert.That(retried.Message?.Literal, Does.Contain("unreachable"));
 
 		// Once the server answers again the issue is simply gone: the list is live, never cached.
 		api.IsOffline = false;
@@ -191,7 +196,8 @@ public sealed class TaskBoardIntegrationTests
 
 		var options = (await harness.Actions.GetOptionsAsync("create-card", "listId")).DataAs<DynamicOptionsResultDto>();
 
-		Assert.That(options!.Options.Select(option => option.Label), Is.EquivalentTo(_listNames));
+		// A list's name comes from the API, so it stays a literal all the way onto the wire.
+		Assert.That(options!.Options.Select(option => option.Label?.Literal), Is.EquivalentTo(_listNames));
 	}
 
 	[Test]
@@ -225,7 +231,7 @@ public sealed class TaskBoardIntegrationTests
 	{
 		var harness = PluginTestHarness.Create(builder =>
 		{
-			builder.RegisterIntegration<RestApiIntegration>();
+			builder.UseLocalization(Strings.LocalizationCatalog).RegisterIntegration<RestApiIntegration>();
 			builder.Services.AddTaskBoardApi().ConfigurePrimaryHttpMessageHandler(() => api);
 		});
 

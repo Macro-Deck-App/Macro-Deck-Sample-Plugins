@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.Weather;
 
@@ -14,26 +15,48 @@ internal sealed class SetConditionAction(WeatherIntegration integration) : IActi
 {
 	public string Id => "set-condition";
 
-	public string Name => "Force weather condition";
+	public LocalizedText Name => Strings.Actions.SetCondition.Name();
 
-	public string Description => "Overrides the condition the next synthetic reading reports.";
+	public LocalizedText Description => Strings.Actions.SetCondition.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("condition", label: "Condition", required: true)
+		ActionParameter.DynamicChoice("condition",
+			label: Strings.Actions.SetCondition.Condition.Label(),
+			required: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
 
+	/// <summary>An option's <c>Value</c> is the wire identity the executor parses back, so it stays the
+	/// enum name; only its <c>Label</c> is localized.</summary>
 	public Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 		=> Task.FromResult(new DynamicOptionsResult
 		{
 			Options =
 			[
 				.. WeatherIntegration.SelectableConditions
-					.Select(condition => new ActionParameterOption { Value = condition.ToString(), Label = condition.ToString() })
+					.Select(condition => new ActionParameterOption
+					{
+						Value = condition.ToString(),
+						Label = ConditionLabel(condition)
+					})
 			]
 		});
+
+	private static LocalizedText ConditionLabel(WeatherCondition condition) => condition switch
+	{
+		WeatherCondition.Clear => Strings.Conditions.Clear(),
+		WeatherCondition.PartlyCloudy => Strings.Conditions.PartlyCloudy(),
+		WeatherCondition.Overcast => Strings.Conditions.Overcast(),
+		WeatherCondition.Rain => Strings.Conditions.Rain(),
+		WeatherCondition.Thunderstorm => Strings.Conditions.Thunderstorm(),
+		WeatherCondition.Snow => Strings.Conditions.Snow(),
+
+		// Unreachable while SelectableConditions is the only caller, and deliberately not a throw: an
+		// enum value added to that list without a resource should show its name, not break the picker.
+		_ => condition.ToString()
+	};
 
 	private sealed class Executor(WeatherIntegration integration) : IActionExecutor
 	{
@@ -43,7 +66,7 @@ internal sealed class SetConditionAction(WeatherIntegration integration) : IActi
 				!Enum.TryParse<WeatherCondition>(text, out var condition))
 			{
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"condition must be a known WeatherCondition name."));
+					MacroDeckStrings.Validation.InvalidValue(Strings.Actions.SetCondition.Condition.Label())));
 			}
 
 			integration.Station.SetForcedCondition(condition);

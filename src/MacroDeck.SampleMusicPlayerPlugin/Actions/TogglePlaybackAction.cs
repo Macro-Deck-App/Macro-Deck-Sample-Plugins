@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleMusicPlayerPlugin.Actions;
@@ -12,13 +13,13 @@ internal sealed class TogglePlaybackAction(MusicPlayerIntegration integration)
 {
 	public string Id => "toggle-playback";
 
-	public string Name => "Play/pause";
+	public LocalizedText Name => Strings.Actions.TogglePlayback.Name();
 
-	public string Description => "Toggles playback on one of the sample players.";
+	public LocalizedText Description => Strings.Actions.TogglePlayback.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("player", label: "Player", required: true)
+		ActionParameter.DynamicChoice("player", label: Strings.Fields.Player.Label(), required: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -34,7 +35,7 @@ internal sealed class TogglePlaybackAction(MusicPlayerIntegration integration)
 				integration.EngineOf(instanceId) is not { } engine)
 			{
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"player must name one of the sample players."));
+					MacroDeckStrings.Validation.InvalidValue(Strings.Fields.Player.Label())));
 			}
 
 			engine.Toggle();

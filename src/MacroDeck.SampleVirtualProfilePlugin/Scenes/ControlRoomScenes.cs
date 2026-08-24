@@ -1,3 +1,5 @@
+using MacroDeck.Localization;
+
 namespace MacroDeck.SampleVirtualProfilePlugin.Scenes;
 
 /// <summary>The scenes the sample control room can be in. Everything else - the virtual profile, the
@@ -16,6 +18,21 @@ internal static class ControlRoomScenes
 
 	internal static ControlRoomScene? Find(string id)
 		=> All.FirstOrDefault(scene => string.Equals(scene.Id, id, StringComparison.Ordinal));
+
+	/// <summary>
+	/// The scene's name for a surface that resolves a reference in the reader's language - an action's
+	/// option label, an event's payload. <see cref="ControlRoomScene.Name"/> stays beside it for the
+	/// surfaces that cannot take one: a virtual widget's JSON payload, a host variable's value and a
+	/// notification title are all plain strings on their contracts.
+	/// </summary>
+	internal static LocalizedText DisplayName(ControlRoomScene scene) => scene.Id switch
+	{
+		"live" => Strings.Scenes.Live(),
+		"standby" => Strings.Scenes.Standby(),
+		"break" => Strings.Scenes.Break(),
+		"offline" => Strings.Scenes.Offline(),
+		_ => scene.Name
+	};
 }
 
 internal sealed record ControlRoomScene(string Id, string Name, string Color, bool IsLive);

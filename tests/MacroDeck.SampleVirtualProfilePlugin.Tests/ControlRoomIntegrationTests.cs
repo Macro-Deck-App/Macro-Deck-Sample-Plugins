@@ -16,6 +16,8 @@ public sealed class ControlRoomIntegrationTests
 	private static readonly string[] _sceneWidgetIds = ["scene-live", "scene-standby", "scene-break", "scene-offline"];
 	private static readonly string[] _breakOnly = ["scene-break"];
 	private static readonly string[] _scriptNames = ["Start stream", "Broken"];
+	private static readonly string[] _onState = ["on"];
+	private static readonly string[] _currentState = [WidgetStates.Current];
 
 	[Test]
 	public async Task The_profile_offers_one_button_per_scene()
@@ -190,6 +192,60 @@ public sealed class ControlRoomIntegrationTests
 	}
 
 	[Test]
+	public async Task Styling_targets_a_state_by_its_own_id()
+	{
+		await using var harness = await CreateAsync();
+		harness.Context.Widgets.Seed(new WidgetTargetInfo
+		{
+			Id = "widget-1",
+			Label = "On air",
+			Location = "Main",
+			Type = "ActionButton",
+			States = [new WidgetStateInfo("on", "On"), new WidgetStateInfo("off", "Off")],
+			CurrentStateId = "off"
+		});
+
+		// The picker offers the two sentinels every widget accepts plus this widget's own states.
+		var options = (await harness.Actions.GetOptionsAsync("style-widget",
+			"state",
+			currentParameters: new Dictionary<string, object?> { ["widget"] = "widget-1" }))
+			.DataAs<DynamicOptionsResultDto>();
+
+		Assert.That(options!.Options.Select(option => option.Value),
+			Is.EqualTo(new[] { WidgetStates.Current, WidgetStates.All, "on", "off" }));
+
+		var outcome = await harness.Actions.ExecuteAsync("style-widget", new Dictionary<string, object?>
+		{
+			["widget"] = "widget-1",
+			["state"] = "on",
+			["label"] = "LIVE"
+		});
+
+		var applied = harness.Context.Widgets.LastApplied["widget-1"];
+
+		Assert.That(outcome.Succeeded, Is.True);
+		Assert.That(applied.ResolveStateIds(), Is.EqualTo(_onState));
+	}
+
+	[Test]
+	public async Task Styling_without_a_state_means_whichever_one_the_widget_shows()
+	{
+		await using var harness = await CreateAsync();
+		harness.Context.Widgets.Seed(new WidgetTargetInfo
+		{
+			Id = "widget-1",
+			Label = "On air",
+			Location = "Main",
+			Type = "ActionButton"
+		});
+
+		await harness.Actions.ExecuteAsync("style-widget",
+			new Dictionary<string, object?> { ["widget"] = "widget-1", ["label"] = "Studio" });
+
+		Assert.That(harness.Context.Widgets.LastApplied["widget-1"].ResolveStateIds(), Is.EqualTo(_currentState));
+	}
+
+	[Test]
 	public async Task The_reset_colour_clears_the_override_instead_of_setting_one()
 	{
 		await using var harness = await CreateAsync();
@@ -252,7 +308,8 @@ public sealed class ControlRoomIntegrationTests
 		var succeeded = await harness.Actions.ExecuteAsync("run-script", new Dictionary<string, object?> { ["scriptId"] = "script-1" });
 		var failed = await harness.Actions.ExecuteAsync("run-script", new Dictionary<string, object?> { ["scriptId"] = "script-2" });
 
-		Assert.That(options!.Options.Select(option => option.Label), Is.EquivalentTo(_scriptNames));
+		// A script's name is the one the user gave it, so it stays a literal all the way onto the wire.
+		Assert.That(options!.Options.Select(option => option.Label?.Literal), Is.EquivalentTo(_scriptNames));
 		Assert.That(succeeded.Succeeded, Is.True);
 		Assert.That(harness.Context.Scripts.Ran, Does.Contain("script-1"));
 		Assert.That(failed.Succeeded, Is.False);
@@ -274,7 +331,9 @@ public sealed class ControlRoomIntegrationTests
 
 		var call = harness.Context.Deck.Calls.Single();
 
-		Assert.That(options!.Options.Single().Label, Is.EqualTo("Studio"));
+		// A folder label is the user's own text, so it travels as a literal rather than as a reference
+		// a client would resolve - which is exactly what Literal reads back.
+		Assert.That(options!.Options.Single().Label?.Literal, Is.EqualTo("Studio"));
 		Assert.That(outcome.Succeeded, Is.True);
 		Assert.That(call.Id, Is.EqualTo("folder-1"));
 		Assert.That(call.OriginClientId, Is.EqualTo("client-3"));
@@ -312,7 +371,9 @@ public sealed class ControlRoomIntegrationTests
 
 	private static async Task<PluginTestHarness> CreateAsync()
 	{
-		var harness = PluginTestHarness.Create(builder => builder.RegisterIntegration<ControlRoomIntegration>());
+		var harness = PluginTestHarness.Create(builder => builder
+			.UseLocalization(Strings.LocalizationCatalog)
+			.RegisterIntegration<ControlRoomIntegration>());
 		await harness.InitializeIntegrationsAsync();
 		return harness;
 	}

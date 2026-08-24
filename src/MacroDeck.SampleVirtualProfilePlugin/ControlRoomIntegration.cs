@@ -1,4 +1,5 @@
 using MacroDeck.Plugin.Hosting.Integrations;
+using MacroDeck.Plugin.Hosting.Integrations.HostApis;
 using MacroDeck.Plugin.Hosting.Transport;
 using MacroDeck.Plugin.Protocol.Handshake;
 using MacroDeck.SampleVirtualProfilePlugin.Actions;
@@ -159,13 +160,13 @@ public sealed class ControlRoomIntegration : IPluginIntegration, IProfileProvide
 		new EventDefinition
 		{
 			Id = SceneChangedEventId,
-			Name = "Scene changed",
-			Description = "Raised when the control room switches to another scene.",
+			Name = Strings.Events.SceneChanged.Name(),
+			Description = Strings.Events.SceneChanged.Description(),
 			PayloadParameters =
 			[
-				ActionParameter.Text("scene", "Scene"),
-				ActionParameter.Toggle("isLive", "On air"),
-				ActionParameter.Text("source", "Triggered by")
+				ActionParameter.Text("scene", Strings.Events.SceneChanged.Scene.Label()),
+				ActionParameter.Toggle("isLive", Strings.Events.SceneChanged.IsLive.Label()),
+				ActionParameter.Text("source", Strings.Events.SceneChanged.Source.Label())
 			]
 		}
 	];

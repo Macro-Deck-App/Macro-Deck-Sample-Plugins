@@ -1,0 +1,19 @@
+name: Install Macro Deck tooling
+description: >
+  Installs macrodeck-plugin at the same release as the SDK packages a sample consumes, so the CLI and
+  the SDK can never drift apart in CI. Both jobs that need the tool use this rather than repeating the
+  version lookup.
+
+inputs:
+  project:
+    description: The plugin project whose MacroDeckSdkVersion decides the CLI version.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        version="$(dotnet msbuild "${{ inputs.project }}" -nologo -getProperty:MacroDeckSdkVersion)"
+        dotnet tool install --global MacroDeck.Plugin.Cli --version "${version}"

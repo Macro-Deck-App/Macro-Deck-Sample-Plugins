@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleMusicPlayerPlugin.Actions;
@@ -11,16 +12,18 @@ internal sealed class TransferPlaybackAction(MusicPlayerIntegration integration)
 {
 	public string Id => "transfer-playback";
 
-	public string Name => "Transfer playback";
+	public LocalizedText Name => Strings.Actions.TransferPlayback.Name();
 
-	public string Description => "Moves playback of the sample library to another device.";
+	public LocalizedText Description => Strings.Actions.TransferPlayback.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
 		ActionParameter.DynamicChoice("device",
-			label: "Device",
-			description: "Leave empty to pick one on the client that pressed the button."),
-		ActionParameter.Toggle("startPlayback", label: "Start playing after the transfer", defaultValue: true)
+			label: Strings.Fields.Device.Label(),
+			description: Strings.Actions.TransferPlayback.Device.Description()),
+		ActionParameter.Toggle("startPlayback",
+			label: Strings.Actions.TransferPlayback.StartPlayback.Label(),
+			defaultValue: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -28,6 +31,8 @@ internal sealed class TransferPlaybackAction(MusicPlayerIntegration integration)
 	public async Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 	{
 		var devices = await integration.Library.GetDevicesAsync(cancellationToken);
+
+		// A device name comes from the device itself, so it is already in its final form: a literal.
 		return new DynamicOptionsResult
 		{
 			Options = [.. devices.Select(device => new ActionParameterOption { Value = device.Id, Label = device.Name })]
@@ -47,13 +52,13 @@ internal sealed class TransferPlaybackAction(MusicPlayerIntegration integration)
 					startPlayback,
 					prompt: "Pick an output device");
 
-				return ActionResult.Accepted("Asked the client to pick a device.");
+				return ActionResult.Accepted(Strings.Actions.TransferPlayback.PickerRequested());
 			}
 
 			var devices = await integration.Library.GetDevicesAsync(context.CancellationToken);
 			if (!devices.Any(device => string.Equals(device.Id, deviceId, StringComparison.Ordinal)))
 			{
-				return ActionResult.Failed(ActionErrorCodes.NotFound, $"No device with id '{deviceId}'.");
+				return ActionResult.Failed(ActionErrorCodes.NotFound, Strings.Errors.DeviceNotFound(deviceId));
 			}
 
 			await integration.Library.TransferPlaybackAsync(deviceId, startPlayback, context.CancellationToken);

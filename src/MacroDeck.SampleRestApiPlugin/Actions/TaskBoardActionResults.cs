@@ -10,6 +10,9 @@ namespace MacroDeck.SampleRestApiPlugin.Actions;
 /// </summary>
 internal static class TaskBoardActionResults
 {
+	/// <summary>Reports <see cref="TaskBoardException.UserMessage"/>, not <c>Message</c>: the error text
+	/// reaches a client that resolves it in its own language, while the exception's own message stays
+	/// what the log records.</summary>
 	internal static ActionResult From(TaskBoardException exception) => ActionResult.Failed(exception.Reason switch
 	{
 		TaskBoardFailure.NotConfigured => ActionErrorCodes.NotConfigured,
@@ -18,5 +21,5 @@ internal static class TaskBoardActionResults
 		TaskBoardFailure.Unauthorized => ActionErrorCodes.PermissionDenied,
 		TaskBoardFailure.NotFound => ActionErrorCodes.NotFound,
 		_ => ActionErrorCodes.ProviderError
-	}, exception.Message);
+	}, exception.UserMessage);
 }

@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleVirtualProfilePlugin.Scenes;
 using MacroDeck.Sdk.Actions;
 
@@ -13,13 +14,13 @@ internal sealed class SetSceneAction(ControlRoomIntegration integration)
 {
 	public string Id => "set-scene";
 
-	public string Name => "Set scene";
+	public LocalizedText Name => Strings.Actions.SetScene.Name();
 
-	public string Description => "Switches the sample control room to another scene.";
+	public LocalizedText Description => Strings.Actions.SetScene.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("scene", label: "Scene", required: true)
+		ActionParameter.DynamicChoice("scene", label: Strings.Actions.SetScene.Scene.Label(), required: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -27,7 +28,14 @@ internal sealed class SetSceneAction(ControlRoomIntegration integration)
 	public Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 		=> Task.FromResult(new DynamicOptionsResult
 		{
-			Options = [.. ControlRoomScenes.All.Select(scene => new ActionParameterOption { Value = scene.Id, Label = scene.Name })]
+			Options =
+			[
+				.. ControlRoomScenes.All.Select(scene => new ActionParameterOption
+				{
+					Value = scene.Id,
+					Label = ControlRoomScenes.DisplayName(scene)
+				})
+			]
 		});
 
 	private sealed class Executor(ControlRoomIntegration integration) : IActionExecutor
@@ -37,7 +45,8 @@ internal sealed class SetSceneAction(ControlRoomIntegration integration)
 			if (context.Parameters.GetValueOrDefault("scene") is not string sceneId ||
 				ControlRoomScenes.Find(sceneId) is not { } scene)
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "scene must name one of the sample scenes.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.InvalidValue(Strings.Actions.SetScene.Scene.Label()));
 			}
 
 			await integration.ApplySceneAsync(scene, source: "action", context.CancellationToken);

@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.Sdk.Actions;
 
 namespace MacroDeck.SampleMusicPlayerPlugin.Actions;
@@ -14,9 +15,9 @@ internal sealed class SetVolumeAction(MusicPlayerIntegration integration)
 
 	public string Id => "set-volume";
 
-	public string Name => "Set volume";
+	public LocalizedText Name => Strings.Actions.SetVolume.Name();
 
-	public string Description => "Sets the volume of one of the sample players.";
+	public LocalizedText Description => Strings.Actions.SetVolume.Description();
 
 	public string SliderValueParameter => "volume";
 
@@ -25,8 +26,8 @@ internal sealed class SetVolumeAction(MusicPlayerIntegration integration)
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("player", label: "Player", required: true),
-		ActionParameter.Slider("volume", Min, Max, label: "Volume (%)", step: 1, defaultValue: 60)
+		ActionParameter.DynamicChoice("player", label: Strings.Fields.Player.Label(), required: true),
+		ActionParameter.Slider("volume", Min, Max, label: Strings.Fields.Volume.Label(), step: 1, defaultValue: 60)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -57,13 +58,13 @@ internal sealed class SetVolumeAction(MusicPlayerIntegration integration)
 				integration.EngineOf(instanceId) is not { } engine)
 			{
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"player must name one of the sample players."));
+					MacroDeckStrings.Validation.InvalidValue(Strings.Fields.Player.Label())));
 			}
 
 			if (context.Parameters.GetValueOrDefault("volume") is not double volume)
 			{
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.InvalidParameter,
-					"volume must be a number."));
+					MacroDeckStrings.Validation.InvalidValue(Strings.Fields.Volume.Label())));
 			}
 
 			engine.SetVolume((int)volume);

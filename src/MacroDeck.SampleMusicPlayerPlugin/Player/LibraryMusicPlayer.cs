@@ -8,8 +8,11 @@ namespace MacroDeck.SampleMusicPlayerPlugin.Player;
 /// descriptor), which is why they are implemented here rather than on the provider - see
 /// <see cref="SpeakerMusicPlayer"/> for an instance that only supports transport.
 /// </summary>
+// ICatalogMusicPlayer rather than IMusicPlayer + IMusicPlayerCatalogProvider: browsing a catalogue and
+// being able to play something out of it are two different capabilities, and play-item is only offered
+// to a player that declares the second one.
 internal sealed class LibraryMusicPlayer(PlaybackEngine engine)
-	: IMusicPlayer, IMusicPlayerCatalogProvider, IMusicPlayerDeviceProvider
+	: ICatalogMusicPlayer, IMusicPlayerDeviceProvider
 {
 	private readonly List<MusicPlayerDevice> _devices =
 	[

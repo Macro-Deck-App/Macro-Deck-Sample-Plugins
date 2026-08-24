@@ -7,9 +7,34 @@
   "description": "How to integrate a third-party REST API: typed HttpClient through DI, a multi-step config flow with a secret and an OAuth branch, integration issues, API-backed variables, events and dynamic options.",
   "icon": "Assets/icon.svg",
   "entrypoints": {
-    "win-x64": { "executable": "MacroDeck.SampleRestApiPlugin.exe" },
-    "osx-arm64": { "executable": "MacroDeck.SampleRestApiPlugin" },
-    "osx-x64": { "executable": "MacroDeck.SampleRestApiPlugin" },
-    "linux-x64": { "executable": "MacroDeck.SampleRestApiPlugin" }
-  }
+    "win-x64": {
+      "executable": "runtimes/win-x64/MacroDeck.SampleRestApiPlugin.exe"
+    },
+    "osx-arm64": {
+      "executable": "runtimes/osx-arm64/MacroDeck.SampleRestApiPlugin"
+    },
+    "osx-x64": {
+      "executable": "runtimes/osx-x64/MacroDeck.SampleRestApiPlugin"
+    },
+    "linux-x64": {
+      "executable": "runtimes/linux-x64/MacroDeck.SampleRestApiPlugin"
+    }
+  },
+  "publisher": {
+    "name": "Macro Deck",
+    "id": "app.macro-deck",
+    "url": "https://macro-deck.app"
+  },
+  "license": "MIT",
+  "homepage": "https://docs.macro-deck.app/introduction/samples-and-template/",
+  "repository": "https://github.com/Macro-Deck-App/Macro-Deck-Sample-Plugins",
+  "compatibility": {
+    "macroDeck": ">=3.0.0"
+  },
+  "permissions": [
+    "host:config",
+    "host:variables",
+    "events:publish",
+    "net:outbound"
+  ]
 }

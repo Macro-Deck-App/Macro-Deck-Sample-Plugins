@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleMusicPlayerPlugin.Player;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.MusicPlayer;
@@ -14,24 +15,34 @@ internal sealed class PlayCatalogItemAction(MusicPlayerIntegration integration)
 {
 	public string Id => "play-catalog-item";
 
-	public string Name => "Play from library";
+	public LocalizedText Name => Strings.Actions.PlayCatalogItem.Name();
 
-	public string Description => "Plays a track or playlist from the sample library.";
+	public LocalizedText Description => Strings.Actions.PlayCatalogItem.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
+		// An option's Value is the wire identity the executor parses back, so it stays the enum name;
+		// only its Label is localized.
 		ActionParameter.Choice("kind",
 			[
-				new ActionParameterOption { Value = nameof(MusicPlayerCatalogItemKind.Track), Label = "Track" },
-				new ActionParameterOption { Value = nameof(MusicPlayerCatalogItemKind.Playlist), Label = "Playlist" }
+				new ActionParameterOption
+				{
+					Value = nameof(MusicPlayerCatalogItemKind.Track),
+					Label = Strings.CatalogKinds.Track()
+				},
+				new ActionParameterOption
+				{
+					Value = nameof(MusicPlayerCatalogItemKind.Playlist),
+					Label = Strings.CatalogKinds.Playlist()
+				}
 			],
-			label: "Kind",
+			label: Strings.Fields.Kind.Label(),
 			defaultValue: nameof(MusicPlayerCatalogItemKind.Track),
 			required: true),
 		ActionParameter.DynamicChoice("item",
-			label: "Item",
-			description: "Leave empty to pick one on the client that pressed the button."),
-		ActionParameter.Toggle("shuffle", label: "Shuffle the playlist")
+			label: Strings.Fields.Item.Label(),
+			description: Strings.Actions.PlayCatalogItem.Item.Description()),
+		ActionParameter.Toggle("shuffle", label: Strings.Actions.PlayCatalogItem.Shuffle.Label())
 			// Shuffling a single track means nothing, so the toggle only shows for a playlist.
 			.OnlyWhen("kind", nameof(MusicPlayerCatalogItemKind.Playlist))
 	];
@@ -43,6 +54,7 @@ internal sealed class PlayCatalogItemAction(MusicPlayerIntegration integration)
 		var kind = ParseKind(context.CurrentParameters.GetValueOrDefault("kind"));
 		var items = MusicLibrary.CatalogItems(kind, context.Filter);
 
+		// A track title is content, not UI text: it is already in its final form and stays a literal.
 		return Task.FromResult(new DynamicOptionsResult
 		{
 			Options = [.. items.Select(item => new ActionParameterOption { Value = item.Id, Label = item.Title })],
@@ -65,12 +77,13 @@ internal sealed class PlayCatalogItemAction(MusicPlayerIntegration integration)
 			{
 				// A picker request is only accepted while this execution is still running, and it is
 				// fire-and-forget: the user's choice arrives as a later execution, not as a return value.
+				// The prompt is a plain string because IActionInteractions types it as one.
 				context.Interactions?.RequestItemPicker(context.OriginClientId,
 					MusicPlayerIntegration.LibraryInstanceId,
 					kind,
 					prompt: "Pick something to play");
 
-				return Task.FromResult(ActionResult.Accepted("Asked the client to pick an item."));
+				return Task.FromResult(ActionResult.Accepted(Strings.Actions.PlayCatalogItem.PickerRequested()));
 			}
 
 			var item = kind == MusicPlayerCatalogItemKind.Playlist
@@ -84,7 +97,7 @@ internal sealed class PlayCatalogItemAction(MusicPlayerIntegration integration)
 			if (item is null)
 			{
 				return Task.FromResult(ActionResult.Failed(ActionErrorCodes.NotFound,
-					$"The sample library has no {kind} with id '{itemId}'."));
+					Strings.Errors.CatalogItemNotFound(itemId)));
 			}
 
 			var engine = integration.Library.Engine;

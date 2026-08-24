@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleRestApiPlugin.Api;
 using MacroDeck.Sdk.Actions;
 
@@ -15,25 +16,30 @@ internal sealed class CreateCardAction(RestApiIntegration integration)
 
 	public string Id => "create-card";
 
-	public string Name => "Create card";
+	public LocalizedText Name => Strings.Actions.CreateCard.Name();
 
-	public string Description => "Creates a card on the Task Board.";
+	public LocalizedText Description => Strings.Actions.CreateCard.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.Text("title", label: "Title", required: true, maxLength: 120),
-		ActionParameter.DynamicChoice("listId", label: "List", required: true),
+		ActionParameter.Text("title", label: Strings.Actions.CreateCard.Title.Label(), required: true, maxLength: 120),
+		ActionParameter.DynamicChoice("listId", label: Strings.Actions.CreateCard.List.Label(), required: true),
+		// An option's Value is what the API is sent, so it stays as the API spells it; only the Label is
+		// a reference the reader's client resolves.
 		ActionParameter.Choice("priority",
 			[
-				new ActionParameterOption { Value = "low", Label = "Low" },
-				new ActionParameterOption { Value = "normal", Label = "Normal" },
-				new ActionParameterOption { Value = HighPriority, Label = "High" }
+				new ActionParameterOption { Value = "low", Label = Strings.Priorities.Low() },
+				new ActionParameterOption { Value = "normal", Label = Strings.Priorities.Normal() },
+				new ActionParameterOption { Value = HighPriority, Label = Strings.Priorities.High() }
 			],
-			label: "Priority",
+			label: Strings.Actions.CreateCard.Priority.Label(),
 			defaultValue: "normal"),
-		ActionParameter.MultilineText("notes", label: "Notes", placeholder: "Optional details"),
+		ActionParameter.MultilineText("notes",
+			label: Strings.Actions.CreateCard.Notes.Label(),
+			placeholder: Strings.Actions.CreateCard.Notes.Placeholder()),
 		// Only a high-priority card gets a due date in this workflow, so the field follows the choice.
-		ActionParameter.DateTime("dueAt", label: "Due").OnlyWhen("priority", HighPriority)
+		ActionParameter.DateTime("dueAt", label: Strings.Actions.CreateCard.DueAt.Label())
+			.OnlyWhen("priority", HighPriority)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
@@ -63,12 +69,14 @@ internal sealed class CreateCardAction(RestApiIntegration integration)
 		{
 			if (context.Parameters.GetValueOrDefault("title") is not string { Length: > 0 } title)
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "title is required.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.Required(Strings.Actions.CreateCard.Title.Label()));
 			}
 
 			if (context.Parameters.GetValueOrDefault("listId") is not string { Length: > 0 } listId)
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "listId is required.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.Required(Strings.Actions.CreateCard.List.Label()));
 			}
 
 			var request = new CreateCardRequest(

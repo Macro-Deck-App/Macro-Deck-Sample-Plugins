@@ -7,9 +7,33 @@
   "description": "Synthetic weather plugin: plain, slider and dynamic-options actions, variables, an event, a config flow and a weather provider on one shared reading.",
   "icon": "Assets/icon.svg",
   "entrypoints": {
-    "win-x64": { "executable": "MacroDeck.SampleWeatherPlugin.exe" },
-    "osx-arm64": { "executable": "MacroDeck.SampleWeatherPlugin" },
-    "osx-x64": { "executable": "MacroDeck.SampleWeatherPlugin" },
-    "linux-x64": { "executable": "MacroDeck.SampleWeatherPlugin" }
-  }
+    "win-x64": {
+      "executable": "runtimes/win-x64/MacroDeck.SampleWeatherPlugin.exe"
+    },
+    "osx-arm64": {
+      "executable": "runtimes/osx-arm64/MacroDeck.SampleWeatherPlugin"
+    },
+    "osx-x64": {
+      "executable": "runtimes/osx-x64/MacroDeck.SampleWeatherPlugin"
+    },
+    "linux-x64": {
+      "executable": "runtimes/linux-x64/MacroDeck.SampleWeatherPlugin"
+    }
+  },
+  "publisher": {
+    "name": "Macro Deck",
+    "id": "app.macro-deck",
+    "url": "https://macro-deck.app"
+  },
+  "license": "MIT",
+  "homepage": "https://docs.macro-deck.app/introduction/samples-and-template/",
+  "repository": "https://github.com/Macro-Deck-App/Macro-Deck-Sample-Plugins",
+  "compatibility": {
+    "macroDeck": ">=3.0.0"
+  },
+  "permissions": [
+    "host:config",
+    "host:variables",
+    "events:publish"
+  ]
 }

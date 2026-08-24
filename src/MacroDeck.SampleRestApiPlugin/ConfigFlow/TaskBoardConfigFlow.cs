@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleRestApiPlugin.Api;
 using MacroDeck.Sdk.Actions;
 using MacroDeck.Sdk.ConfigFlow;
@@ -37,7 +38,7 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 			ServerStepId => SubmitServer(input, context),
 			TokenStepId => await SubmitTokenAsync(input, cancellationToken),
 			CallbackStepId => await SubmitCallbackAsync(context, cancellationToken),
-			_ => ConfigFlowResult.Error(ServerStep(), "Unknown step.")
+			_ => ConfigFlowResult.Error(ServerStep(), Strings.ConfigFlow.UnknownStep())
 		};
 
 	private ConfigFlowResult SubmitServer(IReadOnlyDictionary<string, object?> input, IConfigFlowContext context)
@@ -47,8 +48,11 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 			baseAddress.Scheme is not ("http" or "https"))
 		{
 			return ConfigFlowResult.Error(ServerStep(),
-				"Enter the server's base URL.",
-				new Dictionary<string, string> { [ServerUrlKey] = "Must be an http(s) URL." });
+				MacroDeckStrings.Validation.InvalidUrl(Strings.ConfigFlow.Server.ServerUrl.Label()),
+				new Dictionary<string, LocalizedText>
+				{
+					[ServerUrlKey] = Strings.ConfigFlow.Server.InvalidUrl()
+				});
 		}
 
 		_baseAddress = baseAddress;
@@ -76,9 +80,11 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 	{
 		if (input.GetValueOrDefault(TokenKey) is not string { Length: > 0 } token)
 		{
+			var required = MacroDeckStrings.Validation.Required(Strings.ConfigFlow.Token.ApiToken.Label());
+
 			return ConfigFlowResult.Error(TokenStep(),
-				"Enter an API token.",
-				new Dictionary<string, string> { [TokenKey] = "Required." });
+				required,
+				new Dictionary<string, LocalizedText> { [TokenKey] = required });
 		}
 
 		return await CompleteAsync(token, TokenStep(), cancellationToken);
@@ -90,7 +96,7 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 		// rather than being a live value to poll - see capability-parity.md.
 		if (context.OAuth.AuthorizationCode is not { Length: > 0 } code)
 		{
-			return ConfigFlowResult.Error(ServerStep(), "The authorization was cancelled or returned no code.");
+			return ConfigFlowResult.Error(ServerStep(), Strings.ConfigFlow.OAuth.Cancelled());
 		}
 
 		// A real integration posts the code to the service's token endpoint here. The sample's imaginary
@@ -102,7 +108,7 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 	{
 		if (_baseAddress is not { } baseAddress)
 		{
-			return ConfigFlowResult.Error(ServerStep(), "Start again: the server URL was lost with the session.");
+			return ConfigFlowResult.Error(ServerStep(), Strings.ConfigFlow.Server.SessionLost());
 		}
 
 		try
@@ -111,11 +117,12 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 		}
 		catch (TaskBoardException exception)
 		{
-			return ConfigFlowResult.Error(retryStep, exception.Message);
+			return ConfigFlowResult.Error(retryStep, exception.UserMessage);
 		}
 
 		// Values named here are persisted under those keys; the secret one lands in the host's secret
-		// store and can only be read back through GetSecretAsync.
+		// store and can only be read back through GetSecretAsync. The entry title is deliberately a plain
+		// string: the host stores it as the entry's name and the user renames it from there.
 		return ConfigFlowResult.Complete($"Task Board ({baseAddress.Host})", new Dictionary<string, ConfigFlowValue>
 		{
 			[ServerUrlKey] = ConfigFlowValue.Plain(baseAddress.ToString()),
@@ -129,22 +136,30 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 	private static ConfigFlowStep ServerStep() => new()
 	{
 		StepId = ServerStepId,
-		Title = "Task Board server",
-		Description = "Where the sample's imaginary Task Board API runs, and how to authenticate against it.",
-		Links = [new ConfigFlowLink { Label = "API documentation", Url = "https://example.com/task-board/api" }],
+		Title = Strings.ConfigFlow.Server.Title(),
+		Description = Strings.ConfigFlow.Server.Description(),
+		Links =
+		[
+			new ConfigFlowLink
+			{
+				Label = Strings.ConfigFlow.Server.ApiDocumentation(),
+				Url = "https://example.com/task-board/api"
+			}
+		],
 		Fields =
 		[
+			// A placeholder showing the shape of a URL is an example, not a sentence: it stays a literal.
 			ActionParameter.Url(ServerUrlKey,
-				label: "Server URL",
+				label: Strings.ConfigFlow.Server.ServerUrl.Label(),
 				placeholder: "https://task-board.example.com/api/",
 				required: true,
 				autoPrefixHttps: true),
 			ActionParameter.Choice("authMethod",
 				[
-					new ActionParameterOption { Value = TokenAuth, Label = "API token" },
-					new ActionParameterOption { Value = OAuthAuth, Label = "Sign in (OAuth)" }
+					new ActionParameterOption { Value = TokenAuth, Label = Strings.AuthMethods.Token() },
+					new ActionParameterOption { Value = OAuthAuth, Label = Strings.AuthMethods.OAuth() }
 				],
-				label: "Authentication",
+				label: Strings.ConfigFlow.Server.AuthMethod.Label(),
 				defaultValue: TokenAuth,
 				required: true)
 		]
@@ -153,12 +168,9 @@ internal sealed class TaskBoardConfigFlow(TaskBoardClient client) : IConfigFlow
 	private static ConfigFlowStep TokenStep() => new()
 	{
 		StepId = TokenStepId,
-		Title = "API token",
-		Description = "Paste a personal API token. It is stored in the host's secret store, not in plain configuration.",
-		Instructions =
-		[
-			new ConfigFlowInstruction { Text = "Open Task Board → Settings → API tokens and create a token with board access." }
-		],
-		Fields = [ActionParameter.Secret(TokenKey, label: "API token", required: true)]
+		Title = Strings.ConfigFlow.Token.Title(),
+		Description = Strings.ConfigFlow.Token.Description(),
+		Instructions = [new ConfigFlowInstruction { Text = Strings.ConfigFlow.Token.Instruction() }],
+		Fields = [ActionParameter.Secret(TokenKey, label: Strings.ConfigFlow.Token.ApiToken.Label(), required: true)]
 	};
 }

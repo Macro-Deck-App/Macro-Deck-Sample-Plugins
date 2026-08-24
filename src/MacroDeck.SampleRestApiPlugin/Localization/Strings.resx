@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- The default-language file. Every translation is checked against it and the fallback chain ends
+       here, so it is required even for a plugin that ships one language. Add a language by adding
+       Localization/Strings.<culture>.resx beside it (Strings.de.resx, Strings.pt-BR.resx).
+       A dotted key becomes a nested class: Actions.Foo.Name is Strings.Actions.Foo.Name(). -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions.RefreshBoard.Name" xml:space="preserve">
+    <value>Refresh board</value>
+  </data>
+  <data name="Actions.RefreshBoard.Description" xml:space="preserve">
+    <value>Re-reads the open cards from the Task Board.</value>
+  </data>
+  <data name="Actions.CreateCard.Name" xml:space="preserve">
+    <value>Create card</value>
+  </data>
+  <data name="Actions.CreateCard.Description" xml:space="preserve">
+    <value>Creates a card on the Task Board.</value>
+  </data>
+  <data name="Actions.CreateCard.Title.Label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Actions.CreateCard.List.Label" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="Actions.CreateCard.Priority.Label" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="Actions.CreateCard.Notes.Label" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Actions.CreateCard.Notes.Placeholder" xml:space="preserve">
+    <value>Optional details</value>
+  </data>
+  <data name="Actions.CreateCard.DueAt.Label" xml:space="preserve">
+    <value>Due</value>
+  </data>
+  <data name="Priorities.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Priorities.Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Priorities.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="Actions.CompleteCard.Name" xml:space="preserve">
+    <value>Complete card</value>
+  </data>
+  <data name="Actions.CompleteCard.Description" xml:space="preserve">
+    <value>Marks a card on the Task Board as done.</value>
+  </data>
+  <data name="Actions.CompleteCard.Card.Label" xml:space="preserve">
+    <value>Card</value>
+  </data>
+  <data name="Events.CardCompleted.Name" xml:space="preserve">
+    <value>Card completed</value>
+  </data>
+  <data name="Events.CardCompleted.Description" xml:space="preserve">
+    <value>Raised when this integration completes a card on the Task Board.</value>
+  </data>
+  <data name="Events.CardCompleted.CardId.Label" xml:space="preserve">
+    <value>Card id</value>
+  </data>
+  <data name="Events.CardCompleted.Title.Label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="ConfigFlow.Server.Title" xml:space="preserve">
+    <value>Task Board server</value>
+  </data>
+  <data name="ConfigFlow.Server.Description" xml:space="preserve">
+    <value>Where the sample's imaginary Task Board API runs, and how to authenticate against it.</value>
+  </data>
+  <data name="ConfigFlow.Server.ApiDocumentation" xml:space="preserve">
+    <value>API documentation</value>
+  </data>
+  <data name="ConfigFlow.Server.ServerUrl.Label" xml:space="preserve">
+    <value>Server URL</value>
+  </data>
+  <data name="ConfigFlow.Server.AuthMethod.Label" xml:space="preserve">
+    <value>Authentication</value>
+  </data>
+  <data name="ConfigFlow.Server.InvalidUrl" xml:space="preserve">
+    <value>Must be an http(s) URL.</value>
+  </data>
+  <data name="ConfigFlow.Server.SessionLost" xml:space="preserve">
+    <value>Start again: the server URL was lost with the session.</value>
+  </data>
+  <data name="AuthMethods.Token" xml:space="preserve">
+    <value>API token</value>
+  </data>
+  <data name="AuthMethods.OAuth" xml:space="preserve">
+    <value>Sign in (OAuth)</value>
+  </data>
+  <data name="ConfigFlow.Token.Title" xml:space="preserve">
+    <value>API token</value>
+  </data>
+  <data name="ConfigFlow.Token.Description" xml:space="preserve">
+    <value>Paste a personal API token. It is stored in the host's secret store, not in plain configuration.</value>
+  </data>
+  <data name="ConfigFlow.Token.Instruction" xml:space="preserve">
+    <value>Open Task Board → Settings → API tokens and create a token with board access.</value>
+  </data>
+  <data name="ConfigFlow.Token.ApiToken.Label" xml:space="preserve">
+    <value>API token</value>
+  </data>
+  <data name="ConfigFlow.OAuth.Cancelled" xml:space="preserve">
+    <value>The authorization was cancelled or returned no code.</value>
+  </data>
+  <data name="ConfigFlow.UnknownStep" xml:space="preserve">
+    <value>Unknown step.</value>
+  </data>
+  <data name="Issues.NotConfigured.Title" xml:space="preserve">
+    <value>Task Board is not configured</value>
+  </data>
+  <data name="Issues.NotConfigured.Description" xml:space="preserve">
+    <value>Add the server URL and a token to start using the integration.</value>
+  </data>
+  <data name="Issues.NotConfigured.Action" xml:space="preserve">
+    <value>Configure</value>
+  </data>
+  <data name="Issues.Unauthorized.Title" xml:space="preserve">
+    <value>The Task Board token is no longer valid</value>
+  </data>
+  <data name="Issues.Unauthorized.Description" xml:space="preserve">
+    <value>The server rejected the stored token. Sign in again to replace it.</value>
+  </data>
+  <data name="Issues.Unauthorized.Action" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="Issues.Unreachable.Title" xml:space="preserve">
+    <value>The Task Board server did not answer</value>
+  </data>
+  <data name="Issues.Unreachable.Action" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Issues.Unreachable.Resolved" xml:space="preserve">
+    <value>The Task Board server answered again.</value>
+  </data>
+  <data name="Issues.Unknown" xml:space="preserve">
+    <value>Unknown issue {issueId}.</value>
+  </data>
+  <data name="Notifications.Unavailable.Title" xml:space="preserve">
+    <value>Task Board unavailable</value>
+  </data>
+  <data name="Failures.NotConfigured" xml:space="preserve">
+    <value>The Task Board integration is not configured yet.</value>
+  </data>
+  <data name="Failures.Unreachable" xml:space="preserve">
+    <value>The Task Board API is unreachable.</value>
+  </data>
+  <data name="Failures.Timeout" xml:space="preserve">
+    <value>The Task Board API did not answer in time.</value>
+  </data>
+  <data name="Failures.Unauthorized" xml:space="preserve">
+    <value>The Task Board API rejected the token.</value>
+  </data>
+  <data name="Failures.NotFound" xml:space="preserve">
+    <value>The Task Board API does not know that item.</value>
+  </data>
+  <data name="Failures.ServerError" xml:space="preserve">
+    <value>The Task Board API answered {status}.</value>
+    <comment>[status:int] The HTTP status code the API returned.</comment>
+  </data>
+  <data name="Failures.EmptyBody" xml:space="preserve">
+    <value>The Task Board API answered with an empty body.</value>
+  </data>
+</root>

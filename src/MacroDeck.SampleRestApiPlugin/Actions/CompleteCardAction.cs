@@ -1,3 +1,4 @@
+using MacroDeck.Localization;
 using MacroDeck.SampleRestApiPlugin.Api;
 using MacroDeck.Sdk.Actions;
 
@@ -12,17 +13,19 @@ internal sealed class CompleteCardAction(RestApiIntegration integration)
 {
 	public string Id => "complete-card";
 
-	public string Name => "Complete card";
+	public LocalizedText Name => Strings.Actions.CompleteCard.Name();
 
-	public string Description => "Marks a card on the Task Board as done.";
+	public LocalizedText Description => Strings.Actions.CompleteCard.Description();
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
-		ActionParameter.DynamicChoice("cardId", label: "Card", required: true)
+		ActionParameter.DynamicChoice("cardId", label: Strings.Actions.CompleteCard.Card.Label(), required: true)
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
 
+	/// <summary>A card's title is what the user wrote on the remote board, so the option label is a
+	/// literal - there is nothing to translate about it.</summary>
 	public async Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 	{
 		try
@@ -49,7 +52,8 @@ internal sealed class CompleteCardAction(RestApiIntegration integration)
 		{
 			if (context.Parameters.GetValueOrDefault("cardId") is not string { Length: > 0 } cardId)
 			{
-				return ActionResult.Failed(ActionErrorCodes.InvalidParameter, "cardId is required.");
+				return ActionResult.Failed(ActionErrorCodes.InvalidParameter,
+					MacroDeckStrings.Validation.Required(Strings.Actions.CompleteCard.Card.Label()));
 			}
 
 			try

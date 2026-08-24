@@ -159,3 +159,8 @@ publish
 # Locally packed SDK packages (see README.md) - the directory itself is tracked, its contents are not.
 local-feed/*
 !local-feed/.gitkeep
+
+# Packed plugin artifacts. `macrodeck-plugin build` writes one per sample, and its default --output is
+# the current directory, so they land beside the project unless a path is given.
+*.macroDeckPlugin
+artifacts/

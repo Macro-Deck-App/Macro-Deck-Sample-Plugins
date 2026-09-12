@@ -76,27 +76,48 @@ public sealed class MusicPlayerIntegration : IPluginIntegration, IMusicPlayerPro
 		_ => null
 	};
 
-	public IReadOnlyList<ProvidedVariable> ProvidedVariables { get; } =
+	public IReadOnlyList<VariableDefinition> Variables { get; } =
 	[
-		new ProvidedVariable("sample_music_track", VariableType.Text) { DefinitionId = "track" },
-		new ProvidedVariable("sample_music_artist", VariableType.Text) { DefinitionId = "artist" },
-		new ProvidedVariable("sample_music_is_playing", VariableType.Boolean) { DefinitionId = "is-playing" },
-		new ProvidedVariable("sample_music_volume", VariableType.Numeric) { DefinitionId = "volume" }
+		VariableDefinition.Eager("sample_music_track", VariableType.Text) with { Id = "track" },
+		VariableDefinition.Eager("sample_music_artist", VariableType.Text) with { Id = "artist" },
+		VariableDefinition.Eager("sample_music_is_playing", VariableType.Boolean) with { Id = "is-playing" },
+		// Writable, so a Slider widget bound to it drives the volume and reads the real one back. Volume is
+		// cheap to apply continuously, so the drag is not deferred to release.
+		VariableDefinition.Eager("sample_music_volume", VariableType.Numeric) with
+		{
+			Id = "volume",
+			Unit = "%",
+			SemanticKind = VariableSemanticKinds.Percentage,
+			Write = new VariableWriteCapability()
+		}
 	];
 
-	/// <summary>Reports the library instance. A name this provider does not know returns null, which the
-	/// host renders as an unavailable variable rather than an error.</summary>
-	public Task<object?> GetValueAsync(string name, CancellationToken cancellationToken)
+	/// <summary>Reports the library instance, addressed by local id. An id this provider does not know
+	/// reads as unavailable, which the host renders as an empty value rather than an error.</summary>
+	public ValueTask<VariableReading> ReadAsync(string localId, CancellationToken cancellationToken = default)
 	{
 		var engine = _library.Engine;
-		return Task.FromResult(name switch
+		return ValueTask.FromResult(localId switch
 		{
-			"sample_music_track" => (object?)engine.CurrentTrack.Title,
-			"sample_music_artist" => engine.CurrentTrack.Artist,
-			"sample_music_is_playing" => engine.IsPlaying,
-			"sample_music_volume" => engine.VolumePercent,
-			_ => null
+			"track" => VariableReading.Of(engine.CurrentTrack.Title),
+			"artist" => VariableReading.Of(engine.CurrentTrack.Artist),
+			"is-playing" => VariableReading.Of(engine.IsPlaying),
+			"volume" => VariableReading.Of(engine.VolumePercent, 0, 100, 1),
+			_ => VariableReading.Unavailable
 		});
+	}
+
+	/// <summary>Only called for "volume", the one variable declaring a write. The engine clamps, and the
+	/// clamped value arrives on the next read.</summary>
+	public ValueTask<VariableWriteResult> SetValueAsync(string localId, object? value, CancellationToken cancellationToken = default)
+	{
+		if (value is not (double or int or long))
+		{
+			return ValueTask.FromResult(VariableWriteResult.InvalidValue());
+		}
+
+		_library.Engine.SetVolume((int)Convert.ToDouble(value));
+		return ValueTask.FromResult(VariableWriteResult.Applied());
 	}
 
 	public IReadOnlyList<EventDefinition> EventDefinitions { get; } =

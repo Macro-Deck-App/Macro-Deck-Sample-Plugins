@@ -141,18 +141,18 @@ public sealed class ControlRoomIntegration : IPluginIntegration, IProfileProvide
 		});
 	}
 
-	public IReadOnlyList<ProvidedVariable> ProvidedVariables { get; } =
+	public IReadOnlyList<VariableDefinition> Variables { get; } =
 	[
-		new ProvidedVariable("sample_control_room_active_scene", VariableType.Text) { DefinitionId = "active-scene" },
-		new ProvidedVariable("sample_control_room_is_live", VariableType.Boolean) { DefinitionId = "is-live" }
+		VariableDefinition.Eager("sample_control_room_active_scene", VariableType.Text) with { Id = "active-scene" },
+		VariableDefinition.Eager("sample_control_room_is_live", VariableType.Boolean) with { Id = "is-live" }
 	];
 
-	public Task<object?> GetValueAsync(string name, CancellationToken cancellationToken)
-		=> Task.FromResult(name switch
+	public ValueTask<VariableReading> ReadAsync(string localId, CancellationToken cancellationToken = default)
+		=> ValueTask.FromResult(localId switch
 		{
-			"sample_control_room_active_scene" => (object?)ActiveScene.Name,
-			"sample_control_room_is_live" => ActiveScene.IsLive,
-			_ => null
+			"active-scene" => VariableReading.Of(ActiveScene.Name),
+			"is-live" => VariableReading.Of(ActiveScene.IsLive),
+			_ => VariableReading.Unavailable
 		});
 
 	public IReadOnlyList<EventDefinition> EventDefinitions { get; } =

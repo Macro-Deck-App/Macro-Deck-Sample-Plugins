@@ -4,7 +4,7 @@
   "id": "app.macro-deck.sample-weather",
   "name": "Sample Weather",
   "version": "1.0.0",
-  "description": "Synthetic weather plugin: plain, slider and dynamic-options actions, variables, an event, a config flow and a weather provider on one shared reading.",
+  "description": "Synthetic weather plugin: plain and dynamic-options actions, writable variables, an event, a config flow and a weather provider on one shared reading.",
   "icon": "Assets/icon.svg",
   "entrypoints": {
     "win-x64": {

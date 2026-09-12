@@ -111,13 +111,13 @@ public sealed class MusicPlayerIntegrationTests
 		await harness.MusicPlayer.PlayAsync(Instance(LibraryId));
 
 		var state = await StateAsync(harness, LibraryId);
-		var track = (await harness.Variables.GetAsync("track")).DataAs<VariableValueDto>();
-		var playing = (await harness.Variables.GetAsync("is-playing")).DataAs<VariableValueDto>();
-		var volume = (await harness.Variables.GetAsync("volume")).DataAs<VariableValueDto>();
+		var track = (await harness.Variables.GetAsync("track")).DataAs<VariableReadingDto>();
+		var playing = (await harness.Variables.GetAsync("is-playing")).DataAs<VariableReadingDto>();
+		var volume = (await harness.Variables.GetAsync("volume")).DataAs<VariableReadingDto>();
 
-		Assert.That(track!.Text, Is.EqualTo(state.TrackName));
-		Assert.That(playing!.Boolean, Is.True);
-		Assert.That(volume!.Number, Is.EqualTo(35));
+		Assert.That(track!.Value.Text, Is.EqualTo(state.TrackName));
+		Assert.That(playing!.Value.Boolean, Is.True);
+		Assert.That(volume!.Value.Number, Is.EqualTo(35));
 	}
 
 	[Test]
@@ -231,28 +231,40 @@ public sealed class MusicPlayerIntegrationTests
 	}
 
 	[Test]
-	public async Task The_volume_slider_reads_back_the_selected_players_volume()
+	public async Task The_volume_action_only_changes_the_selected_player()
 	{
 		await using var harness = await CreateAsync();
 
 		await harness.Actions.ExecuteAsync("set-volume",
 			new Dictionary<string, object?> { ["player"] = SpeakerId, ["volume"] = 25.0 });
 
-		var state = (await harness.Actions.GetSliderStateAsync("set-volume",
-			new Dictionary<string, object?> { ["player"] = SpeakerId })).DataAs<SliderStateResult>();
-
-		Assert.That(state!.Value, Is.EqualTo(25));
+		Assert.That((await StateAsync(harness, SpeakerId)).VolumePercent, Is.EqualTo(25));
 		Assert.That((await StateAsync(harness, LibraryId)).VolumePercent, Is.EqualTo(60), "the other player is untouched");
 	}
 
 	[Test]
-	public async Task The_slider_has_no_state_when_no_player_is_chosen_yet()
+	public async Task A_slider_writing_the_volume_variable_sets_the_library_volume()
 	{
 		await using var harness = await CreateAsync();
 
-		var state = (await harness.Actions.GetSliderStateAsync("set-volume")).DataAs<SliderStateResult>();
+		var written = (await harness.Variables.SetAsync("volume",
+			new VariableValueDto { Kind = "number", Number = 35 })).DataAs<VariableSetResult>();
+		var volume = (await harness.Variables.GetAsync("volume")).DataAs<VariableReadingDto>();
 
-		Assert.That(state!.HasValue, Is.False);
+		Assert.That(written!.Status, Is.EqualTo("Applied"));
+		Assert.That(volume!.Value.Number, Is.EqualTo(35));
+		Assert.That((await StateAsync(harness, LibraryId)).VolumePercent, Is.EqualTo(35));
+	}
+
+	[Test]
+	public async Task A_read_only_variable_refuses_a_write()
+	{
+		await using var harness = await CreateAsync();
+
+		var written = (await harness.Variables.SetAsync("track",
+			new VariableValueDto { Kind = "text", Text = "Anything" })).DataAs<VariableSetResult>();
+
+		Assert.That(written!.Status, Is.EqualTo("NotWritable"));
 	}
 
 	[Test]

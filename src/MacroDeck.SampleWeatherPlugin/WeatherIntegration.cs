@@ -92,22 +92,37 @@ public sealed class WeatherIntegration : IPluginIntegration, IVariableProvider, 
 		return Task.CompletedTask;
 	}
 
-	public IReadOnlyList<ProvidedVariable> ProvidedVariables { get; } =
+	public IReadOnlyList<VariableDefinition> Variables { get; } =
 	[
-		new ProvidedVariable("sample_location", VariableType.Text) { DefinitionId = "location" },
-		new ProvidedVariable("sample_temperature_celsius", VariableType.Numeric, DecimalPlaces: 1)
-		{
-			DefinitionId = "temperature-celsius"
-		}
+		VariableDefinition.Eager("sample_location", VariableType.Text) with { Id = "location" },
+		VariableDefinition.Eager("sample_temperature_celsius", VariableType.Numeric, decimalPlaces: 1)
+			with { Id = "temperature-celsius", Unit = "°C" },
+		// Writable, so a Slider widget bound to it sets the threshold and reads the real one back.
+		VariableDefinition.Eager("sample_alert_threshold_celsius", VariableType.Numeric)
+			with { Id = "alert-threshold-celsius", Unit = "°C", Write = new VariableWriteCapability() }
 	];
 
-	public Task<object?> GetValueAsync(string name, CancellationToken cancellationToken)
-		=> Task.FromResult(name switch
+	public ValueTask<VariableReading> ReadAsync(string localId, CancellationToken cancellationToken = default)
+		=> ValueTask.FromResult(localId switch
 		{
-			"sample_location" => (object?)LocationName,
-			"sample_temperature_celsius" => Station.LastSnapshot.Temperature,
-			_ => null
+			"location" => VariableReading.Of(LocationName),
+			"temperature-celsius" => VariableReading.Of(Station.LastSnapshot.Temperature),
+			"alert-threshold-celsius" => VariableReading.Of(AlertThresholdCelsius, SetAlertThresholdAction.Min,
+				SetAlertThresholdAction.Max, 1),
+			_ => VariableReading.Unavailable
 		});
+
+	/// <summary>Only called for the threshold, the one variable declaring a write.</summary>
+	public ValueTask<VariableWriteResult> SetValueAsync(string localId, object? value, CancellationToken cancellationToken = default)
+	{
+		if (value is not (double or int or long))
+		{
+			return ValueTask.FromResult(VariableWriteResult.InvalidValue());
+		}
+
+		AlertThresholdCelsius = Math.Clamp(Convert.ToDouble(value), SetAlertThresholdAction.Min, SetAlertThresholdAction.Max);
+		return ValueTask.FromResult(VariableWriteResult.Applied());
+	}
 
 	// ProviderName is deliberately not implemented: the host falls back to the manifest name, so the one
 	// place this plugin states its name stays manifest.json.

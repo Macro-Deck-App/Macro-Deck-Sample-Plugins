@@ -17,13 +17,13 @@ public sealed class TaskBoardIntegrationTests
 		await using var harness = await CreateAsync(new FakeTaskBoardApi(), configured: false);
 
 		var issues = (await harness.Issues.GetIssuesAsync()).DataAs<IssueListResult>();
-		var configured = (await harness.Variables.GetAsync("configured")).DataAs<VariableValueDto>();
-		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableValueDto>();
+		var configured = (await harness.Variables.GetAsync("configured")).DataAs<VariableReadingDto>();
+		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableReadingDto>();
 
 		Assert.That(issues!.Issues.Single().Id, Is.EqualTo("not-configured"));
 		Assert.That(issues.Issues[0].Severity, Is.EqualTo("Error"));
-		Assert.That(configured!.Boolean, Is.False);
-		Assert.That(openCards!.Kind, Is.EqualTo("unavailable"), "an unconfigured count is unknown, not zero");
+		Assert.That(configured!.Value.Boolean, Is.False);
+		Assert.That(openCards!.Value.Kind, Is.EqualTo("unavailable"), "an unconfigured count is unknown, not zero");
 	}
 
 	[Test]
@@ -48,12 +48,12 @@ public sealed class TaskBoardIntegrationTests
 		await using var harness = await CreateAsync(new FakeTaskBoardApi());
 
 		var issues = (await harness.Issues.GetIssuesAsync()).DataAs<IssueListResult>();
-		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableValueDto>();
-		var next = (await harness.Variables.GetAsync("next-card")).DataAs<VariableValueDto>();
+		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableReadingDto>();
+		var next = (await harness.Variables.GetAsync("next-card")).DataAs<VariableReadingDto>();
 
 		Assert.That(issues!.Issues, Is.Empty);
-		Assert.That(openCards!.Number, Is.EqualTo(2), "the third card is already done");
-		Assert.That(next!.Text, Is.EqualTo("Write the release notes"));
+		Assert.That(openCards!.Value.Number, Is.EqualTo(2), "the third card is already done");
+		Assert.That(next!.Value.Text, Is.EqualTo("Write the release notes"));
 	}
 
 	[Test]
@@ -122,13 +122,13 @@ public sealed class TaskBoardIntegrationTests
 		});
 
 		var created = api.Cards[^1];
-		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableValueDto>();
+		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableReadingDto>();
 
 		Assert.That(outcome.Succeeded, Is.True);
 		Assert.That(created.Title, Is.EqualTo("Order more coffee"));
 		Assert.That(created.ListId, Is.EqualTo("list-ops"));
 		Assert.That(created.Priority, Is.EqualTo("high"));
-		Assert.That(openCards!.Number, Is.EqualTo(3));
+		Assert.That(openCards!.Value.Number, Is.EqualTo(3));
 	}
 
 	[Test]
@@ -155,12 +155,12 @@ public sealed class TaskBoardIntegrationTests
 			new Dictionary<string, object?> { ["cardId"] = "card-1" });
 
 		var published = harness.Context.Events.Published[^1];
-		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableValueDto>();
+		var openCards = (await harness.Variables.GetAsync("open-cards")).DataAs<VariableReadingDto>();
 
 		Assert.That(outcome.Succeeded, Is.True);
 		Assert.That(published.EventId, Is.EqualTo("card-completed"));
 		Assert.That(published.Parameters!.Value.GetProperty("title").GetString(), Is.EqualTo("Write the release notes"));
-		Assert.That(openCards!.Number, Is.EqualTo(1));
+		Assert.That(openCards!.Value.Number, Is.EqualTo(1));
 	}
 
 	[Test]

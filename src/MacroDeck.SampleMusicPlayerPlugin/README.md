@@ -20,7 +20,8 @@ capabilities. Read it when your plugin drives something that plays media.
 - **`Actions/PlayCatalogItemAction.cs`** - dynamic options that depend on another parameter, plus the
   item picker: leaving the item empty asks the client that pressed the button to choose one.
 - **`Actions/TransferPlaybackAction.cs`** - the device-shaped counterpart, with the device picker.
-- **`Actions/SetVolumeAction.cs`** - a slider bound to the selected player's actual volume.
+- **`Actions/SetVolumeAction.cs`** - sets the selected player's volume from a button. A Slider widget
+  binds the writable `sample_music_volume` variable instead, which reads the actual volume back.
 
 Catalogue and device reads are the one place a failure must *throw* rather than degrade to an empty
 result: "nothing found" and "could not load" have to look different in the UI. Everything else here

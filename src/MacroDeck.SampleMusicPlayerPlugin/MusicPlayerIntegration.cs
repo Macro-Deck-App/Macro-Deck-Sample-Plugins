@@ -1,3 +1,4 @@
+using System.Globalization;
 using MacroDeck.SampleMusicPlayerPlugin.Actions;
 using MacroDeck.SampleMusicPlayerPlugin.Player;
 using MacroDeck.Sdk;
@@ -116,7 +117,7 @@ public sealed class MusicPlayerIntegration : IPluginIntegration, IMusicPlayerPro
 			return ValueTask.FromResult(VariableWriteResult.InvalidValue());
 		}
 
-		_library.Engine.SetVolume((int)Convert.ToDouble(value));
+		_library.Engine.SetVolume((int)Convert.ToDouble(value, CultureInfo.InvariantCulture));
 		return ValueTask.FromResult(VariableWriteResult.Applied());
 	}
 

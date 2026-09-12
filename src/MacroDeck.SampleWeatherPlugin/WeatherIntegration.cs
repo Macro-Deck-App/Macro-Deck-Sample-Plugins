@@ -1,3 +1,4 @@
+using System.Globalization;
 using MacroDeck.Plugin.Hosting.Integrations;
 using MacroDeck.Plugin.Hosting.Integrations.HostApis;
 using MacroDeck.Plugin.Protocol.Handshake;
@@ -120,7 +121,7 @@ public sealed class WeatherIntegration : IPluginIntegration, IVariableProvider, 
 			return ValueTask.FromResult(VariableWriteResult.InvalidValue());
 		}
 
-		AlertThresholdCelsius = Math.Clamp(Convert.ToDouble(value), SetAlertThresholdAction.Min, SetAlertThresholdAction.Max);
+		AlertThresholdCelsius = Math.Clamp(Convert.ToDouble(value, CultureInfo.InvariantCulture), SetAlertThresholdAction.Min, SetAlertThresholdAction.Max);
 		return ValueTask.FromResult(VariableWriteResult.Applied());
 	}
 

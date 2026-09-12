@@ -19,8 +19,9 @@ builds, runs and tests without credentials or network access.
   cached reading rather than fetching one, which is the shape `IWeatherStation` asks for.
 - **`Actions/RefreshWeatherAction.cs`** - the plain action, and the one button that makes everything
   else in the sample visibly move.
-- **`Actions/SetAlertThresholdAction.cs`** - the slider action: `GetSliderStateAsync` reads the value
-  back, so a Slider widget shows the threshold that is actually set.
+- **`Actions/SetAlertThresholdAction.cs`** - sets the alert threshold from a button. A Slider widget
+  binds the writable `sample_alert_threshold_celsius` variable instead (`Write` on its
+  `VariableDefinition`, applied in `SetValueAsync`), so it shows the threshold that is actually set.
 - **`Actions/SetConditionAction.cs`** - the dynamic-options action: its field has no static options and
   `GetDynamicOptionsAsync` supplies them.
 - **`ConfigFlow/LocationConfigFlow.cs`** - deliberately the contract's floor: one step, one required
@@ -34,7 +35,7 @@ builds, runs and tests without credentials or network access.
 
 Use this project's **Macro Deck - Real Host** launch profile as described in the repository's
 [run and debug guide](../../README.md#run-and-debug-against-macro-deck). It then shows up as "Sample
-Weather" with three actions, a config flow, a weather station and two variables. Configure a location,
+Weather" with three actions, a config flow, a weather station and three variables. Configure a location,
 add the station to a Weather widget, and press "Refresh weather" to watch the location, the temperature
 and the event move together.
 

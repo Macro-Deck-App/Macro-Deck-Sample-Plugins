@@ -4,22 +4,20 @@ using MacroDeck.Sdk.Actions;
 namespace MacroDeck.SampleWeatherPlugin.Actions;
 
 /// <summary>
-/// The slider action of the three: a Slider widget drags <see cref="SliderValueParameter"/> and reads
-/// it back through <see cref="GetSliderStateAsync"/> for two-way binding. Sets the temperature above
-/// which the next <c>weather-refreshed</c> event reports <c>isAlert</c>.
+/// Sets the temperature above which the next <c>weather-refreshed</c> event reports <c>isAlert</c>. A
+/// Slider widget binds the writable <c>sample_alert_threshold_celsius</c> variable instead, which reads
+/// the threshold back for two-way binding.
 /// </summary>
-internal sealed class SetAlertThresholdAction(WeatherIntegration integration) : IActionDefinition, ISliderActionDefinition
+internal sealed class SetAlertThresholdAction(WeatherIntegration integration) : IActionDefinition
 {
-	private const double Min = -10;
-	private const double Max = 40;
+	internal const double Min = -10;
+	internal const double Max = 40;
 
 	public string Id => "set-alert-threshold";
 
 	public LocalizedText Name => Strings.Actions.SetAlertThreshold.Name();
 
 	public LocalizedText Description => Strings.Actions.SetAlertThreshold.Description();
-
-	public string SliderValueParameter => "thresholdCelsius";
 
 	public IReadOnlyList<ActionParameter> Parameters { get; } =
 	[
@@ -32,11 +30,6 @@ internal sealed class SetAlertThresholdAction(WeatherIntegration integration) : 
 	];
 
 	public IActionExecutor CreateExecutor() => new Executor(integration);
-
-	public Task<SliderActionState?> GetSliderStateAsync(
-		IReadOnlyDictionary<string, object?> parameters,
-		CancellationToken cancellationToken)
-		=> Task.FromResult<SliderActionState?>(new SliderActionState(Min, Max, 1, integration.AlertThresholdCelsius));
 
 	private sealed class Executor(WeatherIntegration integration) : IActionExecutor
 	{

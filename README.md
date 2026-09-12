@@ -15,7 +15,7 @@ cannot disagree. None of them needs an external service, credentials or network 
 
 | Sample | Read it for |
 | --- | --- |
-| [`MacroDeck.SampleWeatherPlugin`](src/MacroDeck.SampleWeatherPlugin) | The smallest complete plugin: plain, slider and dynamic-options actions, variables, an event, a one-step config flow and a weather provider. |
+| [`MacroDeck.SampleWeatherPlugin`](src/MacroDeck.SampleWeatherPlugin) | The smallest complete plugin: plain and dynamic-options actions, read-only and writable variables, an event, a one-step config flow and a weather provider. |
 | [`MacroDeck.SampleMusicPlayerPlugin`](src/MacroDeck.SampleMusicPlayerPlugin) | The full music-player surface: transport, artwork, catalogue browsing, output devices, two instances with different capabilities, dynamic event options and the client-side pickers. |
 | [`MacroDeck.SampleRestApiPlugin`](src/MacroDeck.SampleRestApiPlugin) | A third-party REST API done properly: typed `HttpClient` through DI, a multi-step config flow with a secret and an OAuth branch, integration issues, notifications and API-backed variables and options. |
 | [`MacroDeck.SampleVirtualProfilePlugin`](src/MacroDeck.SampleVirtualProfilePlugin) | A plugin-owned virtual profile with widget interactions, and the callbacks going the other way: deck navigation, widget appearance, scripts, host variables and notifications. |
@@ -35,7 +35,7 @@ in a new one.
 | --- | --- | --- | --- | --- |
 | Actions | ● | ● | ● | ● |
 | Dynamic action options | ● | ● | ● | ● |
-| Slider actions (two-way state) | ● | ● | | |
+| Writable variables (Slider two-way binding) | ● | ● | | |
 | `ActionResult` error mapping | ● | ● | ● | ● |
 | Conditional parameters (`OnlyWhen`) | | ● | ● | ● |
 | Variables (text, numeric, boolean, unavailable) | ● | ● | ● | ● |

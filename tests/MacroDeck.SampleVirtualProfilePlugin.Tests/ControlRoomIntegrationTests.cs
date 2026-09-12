@@ -50,12 +50,12 @@ public sealed class ControlRoomIntegrationTests
 
 		await harness.VirtualProfiles.SendWidgetInteractionAsync(Press("scene-live"));
 
-		var active = (await harness.Variables.GetAsync("active-scene")).DataAs<VariableValueDto>();
-		var isLive = (await harness.Variables.GetAsync("is-live")).DataAs<VariableValueDto>();
+		var active = (await harness.Variables.GetAsync("active-scene")).DataAs<VariableReadingDto>();
+		var isLive = (await harness.Variables.GetAsync("is-live")).DataAs<VariableReadingDto>();
 		var published = harness.Context.Events.Published[^1];
 
-		Assert.That(active!.Text, Is.EqualTo("Live"));
-		Assert.That(isLive!.Boolean, Is.True);
+		Assert.That(active!.Value.Text, Is.EqualTo("Live"));
+		Assert.That(isLive!.Value.Boolean, Is.True);
 		Assert.That(published.EventId, Is.EqualTo("scene-changed"));
 		Assert.That(published.Parameters!.Value.GetProperty("source").GetString(), Is.EqualTo("widget"));
 	}
@@ -117,7 +117,7 @@ public sealed class ControlRoomIntegrationTests
 
 		Assert.That(outcome.Succeeded, Is.True);
 		Assert.That(harness.Context.Events.Published, Has.Count.EqualTo(eventsBefore));
-		Assert.That((await harness.Variables.GetAsync("active-scene")).DataAs<VariableValueDto>()!.Text, Is.EqualTo("Live"));
+		Assert.That((await harness.Variables.GetAsync("active-scene")).DataAs<VariableReadingDto>()!.Value.Text, Is.EqualTo("Live"));
 	}
 
 	[Test]
@@ -127,8 +127,8 @@ public sealed class ControlRoomIntegrationTests
 
 		await harness.Actions.ExecuteAsync("set-scene", new Dictionary<string, object?> { ["scene"] = "break" });
 
-		var active = (await harness.Variables.GetAsync("active-scene")).DataAs<VariableValueDto>();
-		Assert.That(active!.Text, Is.EqualTo("Break"));
+		var active = (await harness.Variables.GetAsync("active-scene")).DataAs<VariableReadingDto>();
+		Assert.That(active!.Value.Text, Is.EqualTo("Break"));
 		Assert.That(harness.Context.Events.Published[^1].Parameters!.Value.GetProperty("source").GetString(),
 			Is.EqualTo("action"));
 	}
@@ -141,7 +141,7 @@ public sealed class ControlRoomIntegrationTests
 		var outcome = await harness.Actions.ExecuteAsync("set-scene", new Dictionary<string, object?> { ["scene"] = "party" });
 
 		Assert.That(outcome.Succeeded, Is.False);
-		Assert.That((await harness.Variables.GetAsync("active-scene")).DataAs<VariableValueDto>()!.Text, Is.EqualTo("Offline"));
+		Assert.That((await harness.Variables.GetAsync("active-scene")).DataAs<VariableReadingDto>()!.Value.Text, Is.EqualTo("Offline"));
 	}
 
 	[Test]

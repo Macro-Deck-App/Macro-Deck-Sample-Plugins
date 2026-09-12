@@ -122,26 +122,24 @@ public sealed class RestApiIntegration : IPluginIntegration, IVariableProvider, 
 			["title"] = card.Title
 		});
 
-	public IReadOnlyList<ProvidedVariable> ProvidedVariables { get; } =
+	public IReadOnlyList<VariableDefinition> Variables { get; } =
 	[
-		new ProvidedVariable("sample_taskboard_open_cards", VariableType.Numeric, RefreshInterval: TimeSpan.FromMinutes(1))
-		{
-			DefinitionId = "open-cards"
-		},
-		new ProvidedVariable("sample_taskboard_next_card", VariableType.Text) { DefinitionId = "next-card" },
-		new ProvidedVariable("sample_taskboard_configured", VariableType.Boolean) { DefinitionId = "configured" }
+		VariableDefinition.Eager("sample_taskboard_open_cards", VariableType.Numeric, refreshInterval: TimeSpan.FromMinutes(1))
+			with { Id = "open-cards" },
+		VariableDefinition.Eager("sample_taskboard_next_card", VariableType.Text) with { Id = "next-card" },
+		VariableDefinition.Eager("sample_taskboard_configured", VariableType.Boolean) with { Id = "configured" }
 	];
 
-	/// <summary>Every value here is unconfigured until the flow has run: returning null is how a provider
-	/// says "unavailable", which the host renders as an empty value rather than a zero.</summary>
-	public Task<object?> GetValueAsync(string name, CancellationToken cancellationToken)
-		=> Task.FromResult(name switch
+	/// <summary>Every value here is unconfigured until the flow has run: <see cref="VariableReading.Unavailable"/>
+	/// is how a provider says so, which the host renders as an empty value rather than a zero.</summary>
+	public ValueTask<VariableReading> ReadAsync(string localId, CancellationToken cancellationToken = default)
+		=> ValueTask.FromResult(localId switch
 		{
-			"sample_taskboard_configured" => (object?)_credentials.IsConfigured,
-			_ when !_credentials.IsConfigured => null,
-			"sample_taskboard_open_cards" => _openCards.Count,
-			"sample_taskboard_next_card" => _openCards.Count > 0 ? _openCards[0].Title : null,
-			_ => null
+			"configured" => VariableReading.Of(_credentials.IsConfigured),
+			_ when !_credentials.IsConfigured => VariableReading.Unavailable,
+			"open-cards" => VariableReading.Of(_openCards.Count),
+			"next-card" when _openCards.Count > 0 => VariableReading.Of(_openCards[0].Title),
+			_ => VariableReading.Unavailable
 		});
 
 	public IReadOnlyList<EventDefinition> EventDefinitions { get; } =

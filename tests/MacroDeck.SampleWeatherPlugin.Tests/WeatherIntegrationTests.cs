@@ -27,10 +27,10 @@ public sealed class WeatherIntegrationTests
 		await harness.InitializeIntegrationsAsync();
 
 		var instances = (await harness.Weather.GetInstancesAsync()).DataAs<WeatherInstancesResult>();
-		var location = (await harness.Variables.GetAsync("location")).DataAs<VariableValueDto>();
+		var location = (await harness.Variables.GetAsync("location")).DataAs<VariableReadingDto>();
 
 		Assert.That(instances!.Instances.Single().DisplayName, Is.EqualTo("Reykjavík, Iceland"));
-		Assert.That(location!.Text, Is.EqualTo("Reykjavík, Iceland"));
+		Assert.That(location!.Value.Text, Is.EqualTo("Reykjavík, Iceland"));
 	}
 
 	[Test]
@@ -73,13 +73,13 @@ public sealed class WeatherIntegrationTests
 		await harness.Actions.ExecuteAsync("refresh-weather");
 
 		var snapshot = await SnapshotAsync(harness);
-		var temperature = (await harness.Variables.GetAsync("temperature-celsius")).DataAs<VariableValueDto>();
+		var temperature = (await harness.Variables.GetAsync("temperature-celsius")).DataAs<VariableReadingDto>();
 
-		Assert.That(temperature!.Number, Is.EqualTo(snapshot.Temperature));
+		Assert.That(temperature!.Value.Number, Is.EqualTo(snapshot.Temperature));
 	}
 
 	[Test]
-	public async Task The_slider_reads_back_the_threshold_it_was_dragged_to()
+	public async Task The_threshold_variable_reads_back_what_the_action_set()
 	{
 		await using var harness = CreateHarness();
 		await harness.InitializeIntegrationsAsync();
@@ -87,10 +87,23 @@ public sealed class WeatherIntegrationTests
 		await harness.Actions.ExecuteAsync("set-alert-threshold",
 			new Dictionary<string, object?> { ["thresholdCelsius"] = 12.0 });
 
-		var state = (await harness.Actions.GetSliderStateAsync("set-alert-threshold")).DataAs<SliderStateResult>();
+		var threshold = (await harness.Variables.GetAsync("alert-threshold-celsius")).DataAs<VariableReadingDto>();
 
-		Assert.That(state!.HasValue, Is.True);
-		Assert.That(state.Value, Is.EqualTo(12));
+		Assert.That(threshold!.Value.Number, Is.EqualTo(12));
+	}
+
+	[Test]
+	public async Task A_slider_writing_the_threshold_variable_is_clamped_to_the_range()
+	{
+		await using var harness = CreateHarness();
+		await harness.InitializeIntegrationsAsync();
+
+		var written = (await harness.Variables.SetAsync("alert-threshold-celsius",
+			new VariableValueDto { Kind = "number", Number = 99 })).DataAs<VariableSetResult>();
+		var threshold = (await harness.Variables.GetAsync("alert-threshold-celsius")).DataAs<VariableReadingDto>();
+
+		Assert.That(written!.Status, Is.EqualTo("Applied"));
+		Assert.That(threshold!.Value.Number, Is.EqualTo(40));
 	}
 
 	[Test]

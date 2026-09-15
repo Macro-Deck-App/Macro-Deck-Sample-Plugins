@@ -29,7 +29,7 @@
   "homepage": "https://docs.macro-deck.app/introduction/samples-and-template/",
   "repository": "https://github.com/Macro-Deck-App/Macro-Deck-Sample-Plugins",
   "compatibility": {
-    "macroDeck": ">=3.0.0"
+    "macroDeck": ">=3.0.0-0"
   },
   "permissions": [
     "host:variables",
